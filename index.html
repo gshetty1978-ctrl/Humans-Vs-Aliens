@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a2a">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'">
+<title>Humans vs Aliens</title>
+<link rel="icon" href="assets/ryan.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="menuBg"></canvas>
+  <div id="screen" class="screen"></div>
+
+  <div id="battle" hidden>
+    <div id="hud">
+      <button class="hbtn" id="btnPause" data-act="pause" aria-label="Pause">II</button>
+      <div class="hstat wave" id="hudWave">WAVE <b id="waveVal">0</b> / <span id="waveTotal">0</span></div>
+      <div class="hstat base"><span class="ico">🏠</span><div class="bar"><i id="baseBar"></i></div><b id="baseVal">100</b></div>
+      <button class="hbtn" id="btnSpeed" data-act="speed" aria-label="Game speed">1x</button>
+    </div>
+    <div id="bossBar" hidden><span id="bossName">BOSS</span><div class="bar"><i id="bossHp"></i><u id="bossShield"></u></div></div>
+    <div id="stage">
+      <div id="bank">
+        <div class="hstat energy" id="hudEnergy"><span class="ico">⚡</span><b id="energyVal">150</b></div>
+        <div id="tray"></div>
+        <button class="hbtn" id="btnCollect" data-act="collect" aria-label="Collect all energy">⚡ COLLECT ALL</button>
+      </div>
+      <div id="field">
+        <canvas id="game" width="964" height="584"></canvas>
+        <div id="banner"></div>
+      </div>
+      <div id="cardTip"></div>
+    </div>
+  </div>
+
+  <div id="modal" hidden></div>
+  <div id="toast"></div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/music.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/sprites2.js"></script>
+<script src="js/world.js"></script>
+<script src="js/worlds2.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/main.js"></script>
+<script src="js/cursor.js"></script>
+</body>
+</html>
