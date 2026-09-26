@@ -20,13 +20,7 @@
   <div id="screen" class="screen"></div>
 
   <div id="battle" hidden>
-    <div id="hud">
-      <button class="hbtn" id="btnPause" data-act="pause" aria-label="Pause">II</button>
-      <div class="hstat wave" id="hudWave">WAVE <b id="waveVal">0</b> / <span id="waveTotal">0</span></div>
-      <div class="hstat base"><span class="ico">🏠</span><div class="bar"><i id="baseBar"></i></div><b id="baseVal">100</b></div>
-      <button class="hbtn" id="btnSpeed" data-act="speed" aria-label="Game speed">1x</button>
-    </div>
-    <div id="bossBar" hidden><span id="bossName">BOSS</span><div class="bar"><i id="bossHp"></i><u id="bossShield"></u></div></div>
+    <div id="bgFill"></div>
     <div id="stage">
       <div id="bank">
         <div class="hstat energy" id="hudEnergy"><span class="ico">⚡</span><b id="energyVal">150</b></div>
@@ -38,6 +32,14 @@
         <div id="banner"></div>
       </div>
       <div id="cardTip"></div>
+      <div id="hud">
+        <button class="hbtn" id="btnPause" data-act="pause" aria-label="Pause">II</button>
+        <div class="hstat wave" id="hudWave">WAVE <b id="waveVal">0</b> / <span id="waveTotal">0</span></div>
+        <div class="hstat base"><span class="ico">🏠</span><div class="bar"><i id="baseBar"></i></div><b id="baseVal">100</b></div>
+        <button class="hbtn" id="btnSpeed" data-act="speed" aria-label="Game speed">1x</button>
+      </div>
+      <div id="bossBar" hidden><span id="bossName">BOSS</span><div class="bar"><i id="bossHp"></i><u id="bossShield"></u></div></div>
+
     </div>
   </div>
 
@@ -54,6 +56,7 @@
 <script src="js/worlds2.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/hud.js"></script>
+<script src="js/install.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/intro.js"></script>
 <script src="js/main.js"></script>

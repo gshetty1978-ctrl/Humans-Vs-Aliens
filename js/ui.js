@@ -220,7 +220,7 @@
       html = '<div class="dialog"><h2 class="win">' + (level.idx === H.LEVELS.length ? 'THE GALAXY IS SAVED!' : level.idx === 20 ? 'EARTH IS SAVED!' : worldDone ? 'WORLD ' + level.world + ' CLEARED!' : 'VICTORY!') + '</h2>' +
         '<div class="big-stars">' + [1, 2, 3].map(n => '<span style="animation-delay:' + (n * 0.35) + 's" class="' + (n <= r.stars ? 'star-on' : 'star-off') + '">★</span>').join('') + '</div>' +
         '<div class="rewards"><div>⚡ BONUS ENERGY<b>+' + bonus + '</b><span class="muted" style="font-size:7px">next level head start</span></div><div>🔧 TECH POINTS<b>+' + tech + '</b></div><div>🪙 COINS<b>+' + coins + '</b></div><div>⭐ XP<b>+' + xp + '</b></div><div>👽 ALIENS DEFEATED<b>' + r.kills + '</b></div></div>' +
-        '<div class="btns">' + (hasNext ? '<button class="btn play" data-act="next">NEXT LEVEL ▶</button>' : '') + '<button class="btn" data-act="retry">↻ RETRY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="tolevels">MAP</button></div></div>';
+        '<div class="btns">' + (hasNext ? '<button class="btn play" data-act="next">NEXT LEVEL ▶</button>' : '') + '<button class="btn" data-act="retry">↻ RETRY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="tolevels">MAP</button>' + H.Install.button() + '</div></div>';
     } else {
       const dCoins = Math.floor(r.kills * 1.5); d.coins += dCoins;
       const ach = S().checkAchievements();
@@ -228,7 +228,7 @@
       ach.forEach((id, n) => setTimeout(() => UI.toast('🏆 ACHIEVEMENT: ' + H.ACHIEVEMENTS.find(a => a.id === id).name, 'ach-t'), 600 + n * 900));
       html = '<div class="dialog"><h2 class="lose">DEFEAT</h2><div>The aliens broke through. Earth needs you, commander.</div>' +
         '<div class="rewards"><div>👽 ALIENS DEFEATED<b>' + r.kills + '</b></div><div>⚡ ENERGY COLLECTED<b>' + r.energy + '</b></div><div>🪙 COINS<b>+' + dCoins + '</b></div></div>' +
-        '<div class="btns"><button class="btn play" data-act="retry">↻ TRY AGAIN</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="tolevels">MAP</button></div></div>';
+        '<div class="btns"><button class="btn play" data-act="retry">↻ TRY AGAIN</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="tolevels">MAP</button>' + H.Install.button() + '</div></div>';
     }
     UI.lastLevel = level;
     UI.lastIds = H.Hud.ids.slice();
@@ -285,6 +285,7 @@
         $('screen').scrollTop = sc; const g2 = document.querySelector('.grid.h-scroll'); if (g2) g2.scrollLeft = hx;
         break;
       }
+      case 'install': H.Install.run(); break;
       case 'closeModal': UI.closeModal(); break;
       case 'next': { const n = UI.lastLevel.idx; UI.closeModal(); H.Hud.stop(); UI.show('prebattle', { i: n }); break; }
       case 'retry': { const l = UI.lastLevel, ids = UI.lastIds; UI.closeModal(); if (ids && ids.length) { UI.hideScreen(); H.Hud.begin(l, ids); } else UI.show('levels', {}); break; }

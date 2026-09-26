@@ -7,7 +7,7 @@
     const src = H.isItem(id) ? H.Sprites.itemURL(id) : H.asset('assets/' + id + '.png');
     const d = H.defOf(id);
     return '<div class="tcard' + (H.isItem(id) ? ' reactor' : '') + '" data-id="' + id + '" role="button" tabindex="0" aria-label="' + d.name + ' ' + d.cost + ' energy">' +
-      '<span class="k">' + (H.ITEM_KEYS[id] || n) + '</span><div class="pt"><img src="' + src + '" alt="" draggable="false"></div><div class="cs">' + d.cost + ' ⚡</div></div>';
+      '<span class="k">' + (H.ITEM_KEYS[id] || n) + '</span><div class="pt"><img src="' + src + '" alt="" draggable="false"></div><div class="cs">' + d.cost + '</div></div>';
   }
 
   function tipHTML(id) {
@@ -53,6 +53,7 @@
       end: r => H.UI.finishBattle(level, r)
     });
     Hud.battle = b;
+    $('bgFill').style.backgroundImage = 'url(' + b.bg.toDataURL() + ')';
     H.Music.play(H.Music.trackFor(level));
     $('waveTotal').textContent = level.waves;
     $('btnSpeed').textContent = '1x';
@@ -157,7 +158,7 @@
       Hud.battle.pointerDown(p.x, p.y);
       Hud.update(true);
     });
-    c.addEventListener('pointerleave', () => { if (Hud.battle) Hud.battle.hover = null; });
+    c.addEventListener('pointerleave', () => { if (Hud.battle) { Hud.battle.hover = null; Hud.battle.pointer = null; } });
     c.addEventListener('contextmenu', e => { e.preventDefault(); if (Hud.battle) Hud.battle.cancel(); });
     const tray = $('tray');
     let drag = null;

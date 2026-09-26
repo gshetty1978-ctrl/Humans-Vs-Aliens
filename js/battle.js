@@ -1294,11 +1294,6 @@
       const d = this.hdef(this.selected);
       const t = this.time;
       ctx.save();
-      for (let r = 0; r < G.ROWS; r++) for (let c = 0; c < G.COLS; c++) {
-        if (this.cells[r][c]) continue;
-        ctx.globalAlpha = 0.16 + 0.08 * Math.sin(t * 5);
-        ctx.fillStyle = '#6dff9a'; ctx.fillRect(cellX(c) + 3, rowTop(r) + 3, G.CW - 6, G.RH - 6);
-      }
       const hv = this.hover;
       if (hv) {
         const occ = this.cells[hv.row][hv.col];
@@ -1314,10 +1309,14 @@
           ctx.globalAlpha = 0.28; ctx.fillStyle = '#ff5a3a';
           ctx.fillRect(Math.max(G.GX, cellCX(hv.col) - G.CW * 1.7), rowTop(r0), Math.min(FIELD_R, cellCX(hv.col) + G.CW * 1.7) - Math.max(G.GX, cellCX(hv.col) - G.CW * 1.7), G.RH * (r1 - r0 + 1));
         }
-        ctx.globalAlpha = occ ? 0.25 : 0.6;
+        ctx.globalAlpha = occ ? 0.2 : 0.4;
         const spr = H.Sprites.human[d.id] || H.Sprites.itemSprite(d.id), sc = H.isItem(d.id) ? 1.5 : 1;
         ctx.drawImage(spr, Math.round(cellCX(hv.col) - spr.width * sc / 2), Math.round(footY(hv.row) - spr.height * sc), Math.round(spr.width * sc), Math.round(spr.height * sc));
         if (occ) this.drawText(ctx, 'X', cellCX(hv.col), rowTop(hv.row) + 52, '#ff6b6b', 20);
+      }
+      if (this.pointer) {
+        const spr = H.Sprites.human[d.id] || H.Sprites.itemSprite(d.id), sc = H.isItem(d.id) ? 1.5 : 1, w = Math.round(spr.width * sc), h = Math.round(spr.height * sc);
+        ctx.globalAlpha = 0.85; ctx.drawImage(spr, Math.round(this.pointer.x - w / 2), Math.round(this.pointer.y - h * 0.62), w, h);
       }
       ctx.restore();
     }
