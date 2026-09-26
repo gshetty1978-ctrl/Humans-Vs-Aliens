@@ -319,3 +319,7 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
 #battle.sandbox #hud .wave, #battle.sandbox #hud .base { display: none; }
 #battle.sandbox #bossBar { bottom: 130px; }
 #battle.sandbox #sbox.min ~ #bossBar { bottom: 50px; }
+
+.itch-link { display: inline-block; margin-top: 12px; font-size: 9px; color: #fff; background: #fa5c5c; padding: 10px 14px; text-decoration: none; box-shadow: inset -3px -3px 0 #b83a3a, inset 3px 3px 0 #ff9a9a, 0 0 0 3px var(--edge); }
+.itch-link:active { transform: translateY(2px); }
+.itch-link { align-self: center; margin-bottom: 4px; }

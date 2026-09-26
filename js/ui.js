@@ -55,6 +55,7 @@
     return '<div class="wrap"><h1 class="title">HUMANS<span class="vs">VS</span>ALIENS</h1><div class="subtitle">DEFEND EARTH. ONE LANE AT A TIME.</div>' +
       '<div class="menu"><button class="btn play" data-act="play">▶ PLAY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="aliens">👽 ALIENS</button><button class="btn" data-act="sandbox">🧪 SANDBOX</button>' +
       '<button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="achievements">🏆 ACHIEVEMENTS</button><button class="btn" data-act="settings">⚙ SETTINGS</button></div>' +
+      '<a class="itch-link" href="https://cricketlover.itch.io/humans-vs-aliens" target="_blank" rel="noopener">🎮 PLAY ON ITCH.IO</a>' +
       '<div class="menu-foot"><span class="pill">RANK LV ' + playerLevel() + '</span><span class="pill">★ ' + totalStars() + ' / ' + H.LEVELS.length * 3 + '</span><span class="pill">🔧 ' + d.tech + ' TECH</span><span class="pill">🪙 ' + d.coins + '</span></div></div>';
   };
 
