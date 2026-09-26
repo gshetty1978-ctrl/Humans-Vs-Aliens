@@ -56,14 +56,17 @@
       this.stats = { kills: 0, energy: 0, placed: 0, baseLost: 0, boss: false };
       this.boss = null; this.ms = null; this.lastRow = -1; this.cd = {};
       this.hint = 0;
-      this.hooks.banner && this.hooks.banner('WAVE 1 IN ' + Math.round(this.nextWaveAt) + 's — COLLECT ⚡', 'info');
+      this.sandbox = !!level.sandbox; this.spawnSel = null; this.spawnBoss = false; this.maxUp = false;
+      if (this.sandbox) { this.energy = 99999; this.nextWaveAt = 1e9; this.dropT = 1e9; }
+      this.hooks.banner && this.hooks.banner(this.sandbox ? 'SANDBOX — NOTHING IS SAVED' : 'WAVE 1 IN ' + Math.round(this.nextWaveAt) + 's — COLLECT ⚡', 'info');
     }
 
-    up(id) { return H.Save.upgrades(id); }
+    up(id) { return this.sandbox && this.maxUp ? { dmg: 5, hp: 5, spd: 5, rng: 5, spc: 5 } : H.Save.upgrades(id); }
     hdef(id) { return H.defOf(id); }
 
     select(id) {
       if (this.state !== 'running') return;
+      if (this.sandbox) this.spawnSel = null;
       if (this.selected === id) { this.selected = null; return; }
       const d = this.hdef(id);
       if (!d) return;
@@ -71,7 +74,7 @@
       if (this.energy < d.cost) { H.Sound.deny(); this.floatText(G.W / 2, 40, 'NEED ' + d.cost + ' ⚡', '#ff6b6b', 12); return; }
       this.selected = id; H.Sound.click();
     }
-    cancel() { this.selected = null; }
+    cancel() { this.selected = null; this.spawnSel = null; }
 
     cellAt(x, y) {
       const col = Math.floor((x - G.GX) / G.CW), row = Math.floor((y - G.GY) / G.RH);
@@ -83,6 +86,11 @@
     pointerDown(x, y) {
       if (this.state !== 'running' || this.paused) return;
       this.pointer = { x, y };
+      if (this.sandbox && this.spawnSel && !this.selected) {
+        const row = Math.floor((y - G.GY) / G.RH);
+        if (row >= 0 && row < G.ROWS && x > G.GX - 10) this.spawnAt(this.spawnSel, row, Math.min(x, FIELD_R + 14), this.spawnBoss);
+        return;
+      }
       let best = null, bd = 1e9;
       for (const d of this.drops) {
         if (d.taken || d.state === 'gone') continue;
@@ -119,8 +127,7 @@
     place(row, col) {
       const d = this.hdef(this.selected);
       if (!d || this.cells[row][col] || this.energy < d.cost || (this.cd[d.id] || 0) > 0) return false;
-      this.energy -= d.cost;
-      this.cd[d.id] = RECHARGE[d.id] || 8;
+      if (!this.sandbox) { this.energy -= d.cost; this.cd[d.id] = RECHARGE[d.id] || 8; }
       const up = this.up(d.id);
       const hp = H.stat(d, up, 'hp');
       const h = {
@@ -679,6 +686,7 @@
           a.x -= spd * dt;
         }
       }
+      if (a.x < G.GX - 4 && this.sandbox) { a.dead = true; a.deathT = 1; a.noCount = true; return; }
       if (a.x < G.GX - 4) {
         const loss = Math.max(3, Math.round(dmg * 0.4));
         this.baseHp -= loss; this.stats.baseLost += loss; this.baseFlash = 0.5;
@@ -716,6 +724,27 @@
         this.floatText(a.x, footY(a.row) - 130, '+' + amt + ' REGEN', '#8dff7a', 10); H.Sound.heal();
         this.burst(a.x, footY(a.row) - 50, 14, ['#8dff7a', '#eaffd0'], 60, -20, 0.6, 3);
       }
+    }
+
+    spawnAt(type, row, x, boss) {
+      if (type === 'mothership') { if (!this.ms || this.ms.dead) this.spawnMothership(); return; }
+      const a = this.spawnAlien(type, row, boss, x);
+      this.burst(x, footY(row) - 30, 12, ['#ff5ad8', '#ffffff', '#7ffcff'], 70, 0, 0.5, 3);
+      return a;
+    }
+    clearAliens() {
+      this.aliens.forEach(a => { if (!a.dead) { a.dead = true; a.deathT = 0.3; a.noCount = true; } });
+      this.queue = []; this.ms = null; this.boss = null; this.aprojs = []; this.zones = []; this.beams = [];
+    }
+    clearHumans() {
+      this.humans.forEach(h => { h.dead = true; h.deathT = 0; });
+      for (let r = 0; r < G.ROWS; r++) this.cells[r].fill(null);
+    }
+    setWorld(id) {
+      this.level = Object.assign({}, this.level, { world: id });
+      this.world = H.WORLDS[id - 1]; this.theme = this.world.theme;
+      this.bg = G.buildBackground(this.theme, id * 13 + 3);
+      G.Fx.init(this.theme);
     }
 
     bomberBlast(a, dmg) {
@@ -881,6 +910,7 @@
       this.time += dt;
       for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] = Math.max(0, this.cd[k] - dt);
       G.Fx.update(dt);
+      if (this.sandbox) this.energy = 99999;
       this.updateWaves(dt);
       this.updateDrops(dt);
       this.updateAuras();
@@ -1300,6 +1330,14 @@
     }
 
     drawPlacementUI(ctx) {
+      if (this.sandbox && this.spawnSel && !this.selected && this.pointer) {
+        const spr = H.Sprites.alien(this.spawnSel, 0), sc = this.spawnSel === 'mothership' ? 1 : 1.5, w = Math.round(spr.width * sc), h = Math.round(spr.height * sc);
+        const row = Math.floor((this.pointer.y - G.GY) / G.RH);
+        if (row >= 0 && row < G.ROWS) {
+          ctx.save(); ctx.globalAlpha = 0.2; ctx.fillStyle = '#ff5ad8'; ctx.fillRect(G.GX, rowTop(row) + 6, G.COLS * G.CW, G.RH - 12);
+          ctx.globalAlpha = 0.75; ctx.drawImage(spr, Math.round(Math.min(this.pointer.x, FIELD_R + 14) - w / 2), Math.round(footY(row) - h + 4), w, h); ctx.restore();
+        }
+      }
       if (!this.selected) return;
       const d = this.hdef(this.selected);
       const t = this.time;

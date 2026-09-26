@@ -44,7 +44,7 @@
     Hud.stop();
     Hud.level = level; Hud.ids = ids.slice();
     $('battle').hidden = false;
-    $('tray').innerHTML = ids.concat(H.ownedItems()).map((id, i) => cardHTML(id, i + 1)).join('');
+    $('tray').innerHTML = ids.concat(level.sandbox ? H.ITEMS.map(i => i.id) : H.ownedItems()).map((id, i) => cardHTML(id, i + 1)).join('');
     Hud.hideTip();
     const b = new H.Battle($('game'), level, ids, {
       hud: () => Hud.update(false),
@@ -65,6 +65,8 @@
 
   Hud.stop = function () {
     Hud.battle = null;
+    const sb = $('sbox'); if (sb) sb.remove();
+    $('battle').classList.remove('sandbox');
     $('battle').hidden = true;
     $('banner').className = '';
     document.querySelectorAll('.modal-battle').forEach(n => n.remove());
@@ -84,7 +86,9 @@
     if (!force && now - Hud.lastHud < 90) return;
     Hud.lastHud = now;
     const ev = $('energyVal'), en = Math.floor(b.energy);
-    if (ev.textContent !== String(en)) ev.textContent = en;
+    const shown = b.sandbox ? '∞' : String(en);
+    if (ev.textContent !== shown) ev.textContent = shown;
+    if (b.sandbox) Hud.syncSandbox();
     $('waveVal').textContent = Math.min(b.waveNo, b.waveTotal);
     const pct = Math.max(0, b.baseHp / b.baseMax * 100);
     const bar = $('baseBar'); bar.style.width = pct + '%'; bar.className = pct < 35 ? 'low' : '';
@@ -105,6 +109,57 @@
     const any = b.drops.some(d => !d.taken && d.state !== 'gone'), cb = $('btnCollect');
     cb.disabled = !any; cb.classList.toggle('ready', any);
     if (b.selected) { const sc = document.querySelector('.tcard.sel'); if (sc && $('cardTip').style.display === 'block') $('cardTip').innerHTML = tipHTML(b.selected); }
+  };
+
+  const SB_ORDER = ['slime', 'grunt', 'brute', 'bomber', 'trooper', 'spiker', 'spitter', 'zapper', 'jet', 'medic', 'shield', 'juggernaut', 'commander', 'prime'];
+  Hud.beginSandbox = function (world) {
+    const lvl = { world: world || 1, level: 1, idx: 1, waves: 999, pool: [], boss: null, name: 'SANDBOX', sandbox: true };
+    Hud.begin(lvl, H.HUMANS.map(h => h.id));
+    $('battle').classList.add('sandbox');
+    const keys = Object.keys(H.ALIENS).filter(k => k !== 'mothership');
+    const list = SB_ORDER.filter(k => H.ALIENS[k]).concat(keys.filter(k => !SB_ORDER.includes(k))).concat(['mothership']);
+    const chip = t => '<button class="sb-chip" data-sp="' + t + '" title="' + H.ALIENS[t].name + '"><img src="' + H.Sprites.alienURL(t) + '" alt="" draggable="false"><span>' + H.ALIENS[t].name.split(' ')[0] + '</span></button>';
+    const p = document.createElement('div');
+    p.id = 'sbox';
+    p.innerHTML = '<div class="sb-bar"><button class="sb-b" data-sb="exit">⏏ EXIT</button><button class="sb-b" data-sb="wprev">◀</button><span class="sb-w" id="sbWorld"></span><button class="sb-b" data-sb="wnext">▶</button>' +
+      '<button class="sb-b" data-sb="boss" id="sbBoss">☠ BOSS: OFF</button><button class="sb-b" data-sb="maxup" id="sbMax">⬆ MAX UPGRADES: OFF</button>' +
+      '<button class="sb-b" data-sb="clra">🧹 ALIENS</button><button class="sb-b" data-sb="clrh">🧹 HUMANS</button><button class="sb-b" data-sb="hide" id="sbHide">▼</button></div>' +
+      '<div class="sb-hint" id="sbHint">PICK A CARD ABOVE TO PLACE A HUMAN · PICK AN ALIEN BELOW, THEN CLICK A LANE · RIGHT-CLICK CANCELS · NOTHING IS SAVED</div>' +
+      '<div class="sb-chips" id="sbChips">' + list.map(chip).join('') + '</div>';
+    p.addEventListener('pointerdown', e => e.stopPropagation());
+    p.addEventListener('click', e => {
+      const b = Hud.battle; if (!b) return;
+      const sp = e.target.closest('[data-sp]'), bt = e.target.closest('[data-sb]');
+      if (sp) { H.Sound.click(); b.selected = null; b.spawnSel = b.spawnSel === sp.dataset.sp ? null : sp.dataset.sp; Hud.update(true); return; }
+      if (!bt) return;
+      H.Sound.click();
+      const k = bt.dataset.sb;
+      if (k === 'exit') { Hud.stop(); H.UI.show('menu'); return; }
+      if (k === 'boss') b.spawnBoss = !b.spawnBoss;
+      if (k === 'maxup') b.maxUp = !b.maxUp;
+      if (k === 'clra') b.clearAliens();
+      if (k === 'clrh') b.clearHumans();
+      if (k === 'hide') p.classList.toggle('min');
+      if (k === 'wprev' || k === 'wnext') {
+        const n = H.WORLDS.length, w = b.level.world;
+        b.setWorld(k === 'wnext' ? (w % n) + 1 : ((w - 2 + n) % n) + 1);
+        $('bgFill').style.backgroundImage = 'url(' + b.bg.toDataURL() + ')';
+      }
+      Hud.update(true);
+    });
+    $('stage').appendChild(p);
+    Hud.update(true);
+  };
+  Hud.syncSandbox = function () {
+    const b = Hud.battle; if (!b) return;
+    const w = H.WORLDS[b.level.world - 1];
+    const set = (id, t) => { const el = $(id); if (el && el.textContent !== t) el.textContent = t; };
+    set('sbWorld', 'W' + w.id + ' ' + w.name);
+    set('sbBoss', '☠ BOSS: ' + (b.spawnBoss ? 'ON' : 'OFF'));
+    set('sbMax', '⬆ MAX UPGRADES: ' + (b.maxUp ? 'ON' : 'OFF'));
+    document.querySelectorAll('.sb-chip').forEach(c => c.classList.toggle('on', c.dataset.sp === b.spawnSel));
+    const bb = $('sbBoss'); if (bb) bb.classList.toggle('on', b.spawnBoss);
+    const mm = $('sbMax'); if (mm) mm.classList.toggle('on', b.maxUp);
   };
 
   Hud.tickCards = function () {
@@ -139,7 +194,8 @@
     const b = Hud.battle;
     if (act === 'pause') { H.Sound.click(); Hud.pause(true); return true; }
     if (act === 'resume') { H.Sound.click(); Hud.pause(false); return true; }
-    if (act === 'restart') { H.Sound.click(); const l = Hud.level, ids = Hud.ids; Hud.begin(l, ids); return true; }
+    if (act === 'restart') { H.Sound.click(); const l = Hud.level, ids = Hud.ids; if (l.sandbox) Hud.beginSandbox(l.world); else Hud.begin(l, ids); return true; }
+    if (act === 'quit' && Hud.level.sandbox) { H.Sound.click(); Hud.stop(); H.UI.show('menu'); return true; }
     if (act === 'quit') { H.Sound.click(); Hud.stop(); H.UI.show('levels', { world: Hud.level.world }); return true; }
     if (act === 'collect' && b) { if (b.collectAll()) Hud.update(true); else H.Sound.deny(); return true; }
     if (act === 'speed' && b) {
