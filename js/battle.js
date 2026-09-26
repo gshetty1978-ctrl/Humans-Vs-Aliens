@@ -20,6 +20,7 @@
   const MUZZLE = {
     ryan: [0.97, 0.37], lucy: [0.98, 0.42], tom: [0.9, 0.5], maya: [0.8, 0.62], sam: [1, 0.37], eli: [0.9, 0.62], priya: [0.98, 0.7], max: [1, 0.62]
   };
+  const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; };
   const rand = (a, b) => a + Math.random() * (b - a);
   const cellX = c => G.GX + c * G.CW;
   const cellCX = c => G.GX + c * G.CW + G.CW / 2;
@@ -594,6 +595,10 @@
         }
       }
       if (df.regen && a.hp < a.maxhp) a.hp = Math.min(a.maxhp, a.hp + df.regen * dt);
+      if (a.boss && Math.random() < dt * 14) {
+        const col = (BURST[a.type] || df.burst || ['#ff5ad8'])[Math.floor(Math.random() * 2)];
+        this.parts.push({ x: a.x + rand(-34, 34) * (df.size || 1), y: footY(a.row) - rand(6, 90) * (df.size || 1), vx: rand(-14, 14), vy: -rand(20, 55), g: 0, life: rand(0.6, 1.1), t: 0, c: col, s: Math.random() < 0.4 ? 4 : 3 });
+      }
       if (a.boss && df.bossAb) { this.bossAbility(a, dt); if (a.hp < a.maxhp * 0.5) spd *= 1.35; }
       if (df.hop) {
         if (a.hopping > 0) { a.hopping -= dt; spd *= 6.5; }
@@ -1139,6 +1144,17 @@
         ctx.fillRect(Math.round(a.x - G.CW * 3), fy - 6, G.CW * 6, 6);
       }
       ctx.globalAlpha = alpha * (a.flying > 0 ? 1 : 1);
+      if (!a.dead && a.boss) {
+        const col = (BURST[a.type] || a.def.burst || ['#ff5ad8'])[0], pulse = 0.5 + 0.5 * Math.sin(this.time * 3 + a.animT), rad = Math.max(w, h) * 0.8, gx = a.x, gy = y + h * 0.55;
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        const gr = ctx.createRadialGradient(gx, gy, rad * 0.08, gx, gy, rad);
+        gr.addColorStop(0, rgba(col, 0.42 + 0.16 * pulse)); gr.addColorStop(0.55, rgba(col, 0.14 + 0.06 * pulse)); gr.addColorStop(1, rgba(col, 0));
+        ctx.fillStyle = gr; ctx.fillRect(gx - rad, gy - rad, rad * 2, rad * 2);
+        ctx.globalAlpha = 0.3 + 0.2 * pulse;
+        const grow = 1.1 + 0.03 * pulse, hw = Math.round(w * grow), hh = Math.round(h * grow);
+        ctx.drawImage(H.Sprites.sil(spr, col), Math.round(x - (hw - w) / 2), Math.round(y - (hh - h)), hw, hh);
+        ctx.restore();
+      }
       ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(Math.round(a.x - w * 0.3), fy - 3, Math.round(w * 0.6), 5);
       ctx.drawImage(spr, x, y, w, Math.round(h * sy));
       if (a.hit > 0 && !a.dead) { ctx.globalAlpha = 0.75; ctx.drawImage(H.Sprites.sil(spr, '#ffffff'), x, y, w, h); }
@@ -1225,6 +1241,14 @@
         ctx.globalAlpha = 0.3 + 0.3 * Math.sin(this.time * 30); ctx.fillStyle = '#ff5ad8';
         ctx.fillRect(x + 40, y + h - 20, w - 80, 30);
         ctx.globalAlpha = dying ? ctx.globalAlpha : 1;
+      }
+      if (!dying) {
+        const pulse = 0.5 + 0.5 * Math.sin(this.time * 2.4), gx = m.x, gy = m.y + 10, rad = w * 0.7;
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        const gr = ctx.createRadialGradient(gx, gy, rad * 0.1, gx, gy, rad);
+        gr.addColorStop(0, rgba('#ff5ad8', 0.34 + 0.14 * pulse)); gr.addColorStop(0.5, rgba('#7b52c9', 0.16 + 0.08 * pulse)); gr.addColorStop(1, rgba('#7b52c9', 0));
+        ctx.fillStyle = gr; ctx.fillRect(gx - rad, gy - rad * 0.7, rad * 2, rad * 1.4);
+        ctx.restore();
       }
       ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x + 60, G.GY + G.RH * 5 - 6, w - 120, 6);
       ctx.drawImage(spr, x, y, w, h);
