@@ -128,7 +128,7 @@
   };
 
   UI.screen_aliens = function () {
-    const order = ['slime', 'grunt', 'brute', 'bomber', 'trooper', 'scorpion', 'burrower', 'cactus', 'spitter', 'zapper', 'jet', 'hopper', 'astronaut', 'shade', 'shield', 'medic', 'spiker', 'golem', 'shard', 'brood', 'larva', 'mindsquid', 'juggernaut', 'commander', 'prime', 'mothership', 'frostling', 'icebat', 'snowmage', 'yeti', 'frosttitan', 'emberhound', 'magmaling', 'lavaslug', 'obsidian', 'magmawyrm', 'piranha', 'jelly', 'angler', 'shellback', 'kraken', 'voidling', 'gravitron', 'eclipse', 'starwyrm', 'voidtitan'];
+    const order = ['slime', 'grunt', 'brute', 'bomber', 'trooper', 'scorpion', 'burrower', 'cactus', 'spitter', 'zapper', 'jet', 'hopper', 'astronaut', 'shade', 'shield', 'medic', 'spiker', 'golem', 'shard', 'brood', 'larva', 'mindsquid', 'juggernaut', 'commander', 'prime', 'mothership', 'frostling', 'icebat', 'snowmage', 'yeti', 'frosttitan', 'emberhound', 'magmaling', 'lavaslug', 'obsidian', 'magmawyrm', 'piranha', 'jelly', 'angler', 'shellback', 'kraken', 'voidling', 'gravitron', 'eclipse', 'starwyrm', 'voidtitan', 'vinelasher', 'sporecap', 'swamptoad', 'mossgolem', 'swamphydra', 'stormsprite', 'thunderbird', 'rocktroll', 'voltbeetle', 'stormcolossus', 'scarab', 'mummy', 'anubis', 'sarcophagus', 'pharaoh', 'nanoswarm', 'turretbot', 'hackerbot', 'tankbot', 'omegaprime'];
     const where = t => H.WORLDS.filter(w => w.pool.includes(t) || w.boss === t).map(w => w.id).join(', ') || '4';
     const cards = order.map(t => {
       const a = H.ALIENS[t];
@@ -217,7 +217,7 @@
       ach.forEach((id, n) => setTimeout(() => UI.toast('🏆 ACHIEVEMENT: ' + H.ACHIEVEMENTS.find(a => a.id === id).name, 'ach-t'), 600 + n * 900));
       const nextIdx = i + 1, hasNext = nextIdx < H.LEVELS.length;
       const worldDone = level.level === 5;
-      html = '<div class="dialog"><h2 class="win">' + (level.idx === H.LEVELS.length ? 'THE GALAXY IS SAVED!' : level.idx === 20 ? 'EARTH IS SAVED!' : worldDone ? 'WORLD ' + level.world + ' CLEARED!' : 'VICTORY!') + '</h2>' +
+      html = '<div class="dialog"><h2 class="win">' + (level.idx === H.LEVELS.length ? 'THE UNIVERSE IS SAVED!' : level.idx === 40 ? 'THE GALAXY IS SAVED!' : level.idx === 20 ? 'EARTH IS SAVED!' : worldDone ? 'WORLD ' + level.world + ' CLEARED!' : 'VICTORY!') + '</h2>' +
         '<div class="big-stars">' + [1, 2, 3].map(n => '<span style="animation-delay:' + (n * 0.35) + 's" class="' + (n <= r.stars ? 'star-on' : 'star-off') + '">★</span>').join('') + '</div>' +
         '<div class="rewards"><div>⚡ BONUS ENERGY<b>+' + bonus + '</b><span class="muted" style="font-size:7px">next level head start</span></div><div>🔧 TECH POINTS<b>+' + tech + '</b></div><div>🪙 COINS<b>+' + coins + '</b></div><div>⭐ XP<b>+' + xp + '</b></div><div>👽 ALIENS DEFEATED<b>' + r.kills + '</b></div></div>' +
         '<div class="btns">' + (hasNext ? '<button class="btn play" data-act="next">NEXT LEVEL ▶</button>' : '') + '<button class="btn" data-act="retry">↻ RETRY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="tolevels">MAP</button>' + H.Install.button() + '</div></div>';

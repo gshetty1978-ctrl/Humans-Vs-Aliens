@@ -5,7 +5,7 @@
   const AP = { sniper: 0.6, gold: 0.3, plasma: 0.3, laser: 0.15, ult: 1 };
   const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, reactor: 7.5, firewall: 20, dynamite: 30 };
   H.RECHARGE = RECHARGE;
-  const BOSS_MULT = { commander: 2, shield: 4, prime: 1.5, frosttitan: 3, magmawyrm: 3, kraken: 3, voidtitan: 4 };
+  const BOSS_MULT = { commander: 2, shield: 4, prime: 1.5, frosttitan: 3, magmawyrm: 3, kraken: 3, voidtitan: 4, swamphydra: 4, stormcolossus: 4, pharaoh: 4, omegaprime: 5 };
   const BURST = {
     slime: ['#34c95f', '#7dffa0', '#1f8d43'], grunt: ['#8a4fd6', '#a56cf0', '#8d93a8'], brute: ['#a97347', '#8f5d3a', '#6b6f80'],
     zapper: ['#9b5de5', '#7ffcff', '#ffe14a'], jet: ['#ff7a59', '#ffd23f', '#8a8fa8'], shield: ['#3a7bd5', '#5cf7ff', '#6fa8ff'],
@@ -180,7 +180,7 @@
 
     spawnAlien(type, row, boss, atX) {
       const d = H.ALIENS[type];
-      const mult = boss ? (BOSS_MULT[type] || 1) : 1;
+      const mult = (boss ? (BOSS_MULT[type] || 1) : 1) * (1 + 0.12 * Math.max(0, this.level.world - 8));
       const a = {
         type, def: d, row, x: atX || FIELD_R + 14, hp: Math.round(d.hp * mult), maxhp: Math.round(d.hp * mult),
         shield: d.shield ? Math.round(d.shield * mult) : 0, maxShield: d.shield ? Math.round(d.shield * mult) : 0,
@@ -314,7 +314,11 @@
         frostling: [5, 1], icebat: [4, 1], snowmage: [2.5, 3], yeti: [2.2 + idx * 0.03, 4],
         emberhound: [5, 1], magmaling: [3.5, 2], lavaslug: [3, 3], obsidian: [1.8, 4],
         piranha: [6, 1], jelly: [3, 2], angler: [3, 3], shellback: [2.5, 3],
-        voidling: [3, 2], gravitron: [2.5, 3], eclipse: [2.5, 3], starwyrm: [3, 3]
+        voidling: [3, 2], gravitron: [2.5, 3], eclipse: [2.5, 3], starwyrm: [3, 3],
+        vinelasher: [5, 1], sporecap: [3, 2], swamptoad: [4, 2], mossgolem: [2, 4],
+        stormsprite: [3, 2], thunderbird: [4, 1], rocktroll: [2.2, 3], voltbeetle: [3, 2],
+        scarab: [6, 1], mummy: [4, 1], anubis: [2.5, 3], sarcophagus: [2, 4],
+        nanoswarm: [6, 1], turretbot: [3, 2], hackerbot: [2.5, 3], tankbot: [1.8, 4]
       };
       const ws = [];
       this.level.pool.forEach(t => {
@@ -355,7 +359,7 @@
       if (isFinal) {
         this.hooks.banner && this.hooks.banner(this.level.boss ? '⚠️ BOSS INCOMING! ⚠️' : '⚠️ FINAL WAVE INCOMING! ⚠️', 'final');
         H.Sound.boss();
-        if (this.level.boss && this.hooks.music) this.hooks.music(this.level.boss === 'mothership' || this.level.boss === 'voidtitan' ? 'mothership' : 'boss');
+        if (this.level.boss && this.hooks.music) this.hooks.music(this.level.boss === 'mothership' || this.level.boss === 'voidtitan' || this.level.boss === 'omegaprime' ? 'mothership' : 'boss');
       }
       this.nextWaveAt = this.time + 30;
       if (isFinal) this.allSpawned = true;
@@ -582,6 +586,7 @@
           this.burst(a.x, footY(a.row) - 40, 8, ['#ff5ad8', '#6a4aa0', '#2a1a4a'], 50, -10, 0.5, 3);
         }
       }
+      if (df.regen && a.hp < a.maxhp) a.hp = Math.min(a.maxhp, a.hp + df.regen * dt);
       if (a.boss && df.bossAb) { this.bossAbility(a, dt); if (a.hp < a.maxhp * 0.5) spd *= 1.35; }
       if (df.hop) {
         if (a.hopping > 0) { a.hopping -= dt; spd *= 6.5; }
@@ -663,7 +668,7 @@
             }
             this.hurtHuman(blocker, dmg);
             if (a.def.poison && !blocker.dead && !blocker.isDrone) { blocker.poisonT = a.def.poison.dur; blocker.poisonDps = a.def.poison.dps; blocker.poisonTick = 1; this.floatText(blocker.x, footY(blocker.row) - 100, a.def.poison.label || 'POISONED', a.def.poison.label ? '#ff8a2a' : '#c25aff', 8); }
-            if (a.def.freeze && !blocker.dead && blocker.id !== 'firewall' && blocker.id !== 'dynamite') { blocker.disabled = Math.max(blocker.disabled || 0, a.def.freeze); this.floatText(blocker.x, footY(blocker.row) - 90, 'FROZEN!', '#9fe8ff', 9); this.burst(blocker.x, footY(blocker.row) - 40, 8, ['#9fe8ff', '#ffffff', '#5ab8e8'], 60, 0, 0.5, 3); }
+            if (a.def.freeze && !blocker.dead && blocker.id !== 'firewall' && blocker.id !== 'dynamite') { blocker.disabled = Math.max(blocker.disabled || 0, a.def.freeze); this.floatText(blocker.x, footY(blocker.row) - 90, a.def.freezeText || 'FROZEN!', '#9fe8ff', 9); this.burst(blocker.x, footY(blocker.row) - 40, 8, ['#9fe8ff', '#ffffff', '#5ab8e8'], 60, 0, 0.5, 3); }
             if (blocker.id === 'firewall' && !blocker.dead) {
               this.hurtAlien(a, 8, false, 1);
               this.burst(a.x + 8, footY(a.row) - 40, 6, ['#ff7a1a', '#ffe14a', '#ff3b1a'], 60, -30, 0.4, 3);
@@ -695,7 +700,7 @@
       if (kind === 'freeze' || kind === 'grab') {
         const cnt = new Array(G.ROWS).fill(0); foes.forEach(h => cnt[h.row]++);
         const row = cnt.indexOf(Math.max(...cnt));
-        const lbl = kind === 'grab' ? 'TENTACLE GRAB!' : 'FLASH FREEZE!';
+        const lbl = (df.abLabel && df.abLabel[kind]) || (kind === 'grab' ? 'TENTACLE GRAB!' : 'FLASH FREEZE!');
         this.floatText(a.x, footY(a.row) - 130, lbl, '#9fe8ff', 11); H.Sound.zap();
         foes.forEach(h => { if (h.row === row) { h.disabled = Math.max(h.disabled || 0, 3); this.burst(h.x, footY(h.row) - 40, 10, ['#9fe8ff', '#ffffff', '#5ab8e8'], 70, 0, 0.5, 3); } });
         this.flashScreen = 0.1;
@@ -1080,7 +1085,7 @@
     }
 
     drawAlien(ctx, a) {
-      const frame = Math.floor(a.animT * (['brute', 'commander', 'juggernaut', 'spiker', 'medic', 'prime', 'cactus', 'golem', 'brood', 'astronaut', 'yeti', 'frosttitan', 'magmawyrm', 'obsidian', 'kraken', 'voidtitan', 'shellback'].includes(a.type) ? 3 : 5)) % 2;
+      const frame = Math.floor(a.animT * (['brute', 'commander', 'juggernaut', 'spiker', 'medic', 'prime', 'cactus', 'golem', 'brood', 'astronaut', 'yeti', 'frosttitan', 'magmawyrm', 'obsidian', 'kraken', 'voidtitan', 'shellback', 'mossgolem', 'swamphydra', 'rocktroll', 'stormcolossus', 'sarcophagus', 'pharaoh', 'tankbot', 'omegaprime'].includes(a.type) ? 3 : 5)) % 2;
       const spr = H.Sprites.alien(a.type, frame);
       const w = Math.round(spr.width * AL_SCALE), h = Math.round(spr.height * AL_SCALE);
       const fy = footY(a.row);

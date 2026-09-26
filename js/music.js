@@ -192,6 +192,38 @@
         { prog: [P(0, 'dim'), P(1, 'maj'), P(0, 'dim'), P(4, 'sus2')], bars: 4, drums: 'off', bass: 'sub', arp: 'glitch', seed: 153, breakdown: true }
       ]
     },
+    w9: {
+      bpm: 100, root: 38, scale: 'dorian', swing: 0.05, padI: 'drone', leadI: 'reed', arpI: 'pluck', bassI: 'round',
+      sections: [
+        { prog: rep([P(0, 'min7'), P(3, 'maj'), P(0, 'min7'), P(4, 'min7')], 2), drums: 'desert', bass: 'walk', arp: 'skip', seed: 201 },
+        { prog: rep([P(3, 'maj'), P(0, 'min7'), P(5, 'maj7'), P(4, 'min7')], 2), drums: 'half', bass: 'walk', arp: 'gate8', seed: 212, shift: 2 },
+        { prog: [P(0, 'min7'), P(4, 'min7'), P(0, 'min7'), P(3, 'maj')], bars: 4, drums: 'off', bass: 'sub', arp: 'skip', seed: 223, breakdown: true }
+      ]
+    },
+    w10: {
+      bpm: 138, root: 40, scale: 'harm', swing: 0, padI: 'dark', leadI: 'super', arpI: 'stab', bassI: 'dist',
+      sections: [
+        { prog: rep([P(0, 'min'), P(5, 'maj'), P(3, 'min'), P(4, 'maj')], 2), drums: 'four', bass: 'drive', arp: 'up16', seed: 231 },
+        { prog: rep([P(0, 'min'), P(6, 'dim'), P(5, 'maj'), P(4, 'maj')], 2), drums: 'brk', bass: 'gallop', arp: 'pulse', seed: 242, shift: 2 },
+        { prog: [P(0, 'min'), P(5, 'maj'), P(3, 'min'), P(4, 'maj')], bars: 4, drums: 'off', bass: 'sub', arp: 'updown', seed: 253, breakdown: true }
+      ]
+    },
+    w11: {
+      bpm: 112, root: 37, scale: 'phryDom', swing: 0.04, padI: 'choir', leadI: 'reed', arpI: 'oud', bassI: 'round',
+      sections: [
+        { prog: rep([P(0, 'maj'), P(1, 'maj'), P(0, 'maj'), P(3, 'min')], 2), drums: 'desert', bass: 'walk', arp: 'gate8', seed: 261 },
+        { prog: rep([P(3, 'min'), P(4, 'dom7'), P(0, 'maj'), P(1, 'maj')], 2), drums: 'desert', bass: 'walk', arp: 'skip', seed: 272, shift: 3 },
+        { prog: [P(0, 'maj'), P(1, 'maj'), P(0, 'maj'), P(1, 'maj')], bars: 4, drums: 'off', bass: 'sub', arp: 'gate8', seed: 283, breakdown: true }
+      ]
+    },
+    w12: {
+      bpm: 146, root: 34, scale: 'minor', swing: 0, padI: 'glass', leadI: 'ring', arpI: 'glitch', bassI: 'wobble',
+      sections: [
+        { prog: rep([P(0, 'min'), P(5, 'maj'), P(6, 'maj'), P(4, 'min7')], 2), drums: 'glitch', bass: 'wobble', arp: 'up16', seed: 291, fxSweep: true },
+        { prog: rep([P(3, 'min'), P(0, 'min'), P(5, 'maj'), P(6, 'maj')], 2), drums: 'four', bass: 'drive', arp: 'glitch', seed: 302, shift: 2, fxSweep: true },
+        { prog: [P(0, 'min7'), P(5, 'maj7'), P(3, 'min7'), P(4, 'dom7')], bars: 4, drums: 'off', bass: 'sub', arp: 'glitch', seed: 313, breakdown: true }
+      ]
+    },
     boss: {
       bpm: 152, root: 36, scale: 'harm', fixed: 1, swing: 0, padI: 'dark', leadI: 'dist', arpI: 'stab', bassI: 'dist', boss: true,
       sections: [
