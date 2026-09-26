@@ -32,13 +32,53 @@
       }
     }
   }
+  const clamp8 = v => v < 0 ? 0 : v > 255 ? 255 : v;
+  function polish(c) {
+    const g = c.getContext('2d'), w = c.width, h = c.height;
+    const img = g.getImageData(0, 0, w, h), d = img.data, src = new Uint8ClampedArray(d);
+    const op = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? 0 : (src[(y * w + x) * 4 + 3] > 60 ? 1 : 0);
+    let y0 = h, y1 = 0;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (op(x, y)) { if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    const span = Math.max(1, y1 - y0);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (!op(x, y)) continue;
+      const i = (y * w + x) * 4;
+      let f = 1.08 - 0.18 * ((y - y0) / span), warm = 0, cool = 0;
+      if (!op(x, y - 1) || !op(x - 1, y)) { f *= 1.2; warm = 10; }
+      else if (!op(x - 1, y - 1)) { f *= 1.08; warm = 4; }
+      if (!op(x, y + 1) || !op(x + 1, y)) { f *= 0.8; cool = 12; }
+      else if (!op(x + 1, y + 1)) { f *= 0.9; cool = 5; }
+      d[i] = clamp8(src[i] * f + warm - cool * 0.5);
+      d[i + 1] = clamp8(src[i + 1] * f + warm * 0.6);
+      d[i + 2] = clamp8(src[i + 2] * f + cool);
+    }
+    g.putImageData(img, 0, 0);
+  }
+  function selOutline(c) {
+    const g = c.getContext('2d'), w = c.width, h = c.height;
+    const img = g.getImageData(0, 0, w, h), d = img.data, src = new Uint8ClampedArray(d);
+    const at = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? -1 : (src[(y * w + x) * 4 + 3] > 40 ? (y * w + x) * 4 : -1);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (at(x, y) >= 0) continue;
+      const nb = [at(x - 1, y), at(x + 1, y), at(x, y - 1), at(x, y + 1)].filter(v => v >= 0);
+      if (!nb.length) continue;
+      let r = 0, gg = 0, b = 0;
+      nb.forEach(j => { r += src[j]; gg += src[j + 1]; b += src[j + 2]; });
+      r /= nb.length; gg /= nb.length; b /= nb.length;
+      const below = at(x, y - 1) >= 0 ? 0.28 : 0.42;
+      const i = (y * w + x) * 4;
+      d[i] = clamp8(r * below + 10); d[i + 1] = clamp8(gg * below + 6); d[i + 2] = clamp8(b * below + 22); d[i + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+  }
   function build(w, h, fn, pad) {
     pad = pad || 1;
     const [c, g] = mk(w + pad * 2, h + pad * 2);
     g.translate(pad, pad);
     fn(g);
     g.setTransform(1, 0, 0, 1, 0, 0);
-    outline(c, '#120a20');
+    polish(c);
+    selOutline(c);
     return c;
   }
 
