@@ -232,6 +232,22 @@
         { prog: rep([P(3, 'min'), P(4, 'maj'), P(0, 'min'), P(4, 'maj')], 2), drums: 'boss', bass: 'gallop', arp: 'stab', seed: 26, shift: 2 }
       ]
     },
+    boss2: {
+      bpm: 160, root: 33, scale: 'phryg', fixed: 1, swing: 0, padI: 'dark', leadI: 'dist', arpI: 'stab', bassI: 'dist', boss: true,
+      sections: [
+        { prog: rep([P(0, 'min'), P(1, 'maj'), P(0, 'min'), P(6, 'maj')], 2), drums: 'boss', bass: 'gallop', arp: 'pulse', seed: 401 },
+        { prog: rep([P(0, 'min'), P(5, 'maj'), P(1, 'maj'), P(0, 'dim')], 2), drums: 'boss', bass: 'gallop', arp: 'stab', seed: 412, shift: 3 },
+        { prog: rep([P(3, 'min'), P(1, 'maj'), P(0, 'min'), P(4, 'dim')], 2), drums: 'glitch', bass: 'wobble', arp: 'pulse', seed: 423, shift: 2 }
+      ]
+    },
+    boss3: {
+      bpm: 168, root: 38, scale: 'harm', fixed: 1, swing: 0, padI: 'choir', leadI: 'dist', arpI: 'glitch', bassI: 'dist', boss: true,
+      sections: [
+        { prog: rep([P(0, 'min'), P(3, 'min'), P(5, 'maj'), P(4, 'maj')], 2), drums: 'boss', bass: 'gallop', arp: 'up16', seed: 431 },
+        { prog: rep([P(0, 'min'), P(6, 'dim'), P(5, 'maj'), P(4, 'dom7')], 2), drums: 'boss', bass: 'gallop', arp: 'stab', seed: 442, shift: 2 },
+        { prog: rep([P(5, 'maj'), P(4, 'maj'), P(0, 'min'), P(0, 'min')], 2), drums: 'glitch', bass: 'gallop', arp: 'pulse', seed: 453, shift: 3 }
+      ]
+    },
     mothership: {
       bpm: 140, root: 47, scale: 'phryg', fixed: 1, swing: 0, padI: 'choir', leadI: 'dist', arpI: 'glitch', bassI: 'dist', boss: true, siren: true,
       sections: [

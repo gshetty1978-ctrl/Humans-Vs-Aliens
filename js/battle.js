@@ -367,7 +367,7 @@
       if (isFinal) {
         this.hooks.banner && this.hooks.banner(this.level.boss ? '⚠️ BOSS INCOMING! ⚠️' : '⚠️ FINAL WAVE INCOMING! ⚠️', 'final');
         H.Sound.boss();
-        if (this.level.boss && this.hooks.music) this.hooks.music(this.level.boss === 'mothership' || this.level.boss === 'voidtitan' || this.level.boss === 'omegaprime' ? 'mothership' : 'boss');
+        if (this.level.boss && this.hooks.music) this.hooks.music(['mothership', 'voidtitan', 'omegaprime'].includes(this.level.boss) ? 'mothership' : this.level.world >= 9 ? 'boss3' : this.level.world >= 5 ? 'boss2' : 'boss');
       }
       this.nextWaveAt = this.time + 30;
       if (isFinal) this.allSpawned = true;
