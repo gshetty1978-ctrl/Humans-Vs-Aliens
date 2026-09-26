@@ -7,7 +7,7 @@
     const src = H.isItem(id) ? H.Sprites.itemURL(id) : H.asset('assets/' + id + '.png');
     const d = H.defOf(id);
     return '<div class="tcard' + (H.isItem(id) ? ' reactor' : '') + '" data-id="' + id + '" role="button" tabindex="0" aria-label="' + d.name + ' ' + d.cost + ' energy">' +
-      '<span class="k">' + (H.ITEM_KEYS[id] || n) + '</span><div class="pt"><img src="' + src + '" alt="" draggable="false"></div><div class="cs">' + d.cost + '</div></div>';
+      '<span class="k">' + (H.ITEM_KEYS[id] || n) + '</span><div class="pt"><img src="' + src + '" alt="" draggable="false"></div><div class="cs">' + d.cost + '</div><i class="rc"></i></div>';
   }
 
   function tipHTML(id) {
@@ -105,6 +105,17 @@
     const any = b.drops.some(d => !d.taken && d.state !== 'gone'), cb = $('btnCollect');
     cb.disabled = !any; cb.classList.toggle('ready', any);
     if (b.selected) { const sc = document.querySelector('.tcard.sel'); if (sc && $('cardTip').style.display === 'block') $('cardTip').innerHTML = tipHTML(b.selected); }
+  };
+
+  Hud.tickCards = function () {
+    const b = Hud.battle;
+    if (!b) return;
+    document.querySelectorAll('.tcard').forEach(card => {
+      const id = card.dataset.id, left = b.cd[id] || 0, tot = H.RECHARGE[id] || 8, rc = card.lastElementChild;
+      const on = left > 0;
+      if (card._cd !== on) { card._cd = on; card.classList.toggle('cool', on); }
+      if (rc && rc.className === 'rc') rc.style.height = on ? (left / tot * 100).toFixed(1) + '%' : '0';
+    });
   };
 
   Hud.pause = function (on) {

@@ -301,3 +301,5 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
   #battle .hstat.wave, #battle .hstat.base { min-height: 28px; padding: 3px 6px; }
   #battle #bank { max-width: calc(100% - 230px); }
 }
+#battle .tcard .rc { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(10, 10, 20, .68); pointer-events: none; z-index: 2; border-bottom: 2px solid rgba(255, 255, 255, .25); }
+#battle .tcard.cool { filter: none; }

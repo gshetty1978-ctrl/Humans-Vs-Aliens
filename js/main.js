@@ -33,6 +33,7 @@
       if (b.paused || b.state !== 'running') b.update(dt);
       else b.update(dt);
       b.render();
+      H.Hud.tickCards();
     } else {
       H.MenuScene.update(dt);
       mctx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);

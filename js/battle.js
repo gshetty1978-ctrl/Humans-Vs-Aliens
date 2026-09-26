@@ -3,6 +3,8 @@
   const FIELD_R = G.GX + G.COLS * G.CW;
   const AL_SCALE = 1.5;
   const AP = { sniper: 0.6, gold: 0.3, plasma: 0.3, laser: 0.15, ult: 1 };
+  const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, reactor: 7.5, firewall: 20, dynamite: 30 };
+  H.RECHARGE = RECHARGE;
   const BOSS_MULT = { commander: 2, shield: 4, prime: 1.5, frosttitan: 3, magmawyrm: 3, kraken: 3, voidtitan: 4 };
   const BURST = {
     slime: ['#34c95f', '#7dffa0', '#1f8d43'], grunt: ['#8a4fd6', '#a56cf0', '#8d93a8'], brute: ['#a97347', '#8f5d3a', '#6b6f80'],
@@ -52,7 +54,7 @@
       this.dropT = 3.5; this.shake = 0; this.flashScreen = 0;
       this.selected = null; this.hover = null; this.pointer = null;
       this.stats = { kills: 0, energy: 0, placed: 0, baseLost: 0, boss: false };
-      this.boss = null; this.ms = null; this.lastRow = -1;
+      this.boss = null; this.ms = null; this.lastRow = -1; this.cd = {};
       this.hint = 0;
       this.hooks.banner && this.hooks.banner('WAVE 1 IN ' + Math.round(this.nextWaveAt) + 's — COLLECT ⚡', 'info');
     }
@@ -65,6 +67,7 @@
       if (this.selected === id) { this.selected = null; return; }
       const d = this.hdef(id);
       if (!d) return;
+      if ((this.cd[id] || 0) > 0) { H.Sound.deny(); this.floatText(G.W / 2, 40, 'RECHARGING…', '#ff6b6b', 12); return; }
       if (this.energy < d.cost) { H.Sound.deny(); this.floatText(G.W / 2, 40, 'NEED ' + d.cost + ' ⚡', '#ff6b6b', 12); return; }
       this.selected = id; H.Sound.click();
     }
@@ -115,8 +118,9 @@
 
     place(row, col) {
       const d = this.hdef(this.selected);
-      if (!d || this.cells[row][col] || this.energy < d.cost) return false;
+      if (!d || this.cells[row][col] || this.energy < d.cost || (this.cd[d.id] || 0) > 0) return false;
       this.energy -= d.cost;
+      this.cd[d.id] = RECHARGE[d.id] || 8;
       const up = this.up(d.id);
       const hp = H.stat(d, up, 'hp');
       const h = {
@@ -870,6 +874,7 @@
 
     step(dt) {
       this.time += dt;
+      for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] = Math.max(0, this.cd[k] - dt);
       G.Fx.update(dt);
       this.updateWaves(dt);
       this.updateDrops(dt);
