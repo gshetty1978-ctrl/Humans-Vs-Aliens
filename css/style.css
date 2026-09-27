@@ -353,3 +353,5 @@ html[lang="hi"] .btn, html[lang="mr"] .btn, html[lang="hi"] .dd-btn, html[lang="
 #battle .hstat.wave { white-space: nowrap; }
 #battle .hstat.base { width: clamp(110px, 12vw, 190px); }
 @media (max-width: 900px) { #battle .hstat.base .ico { display: none; } #battle .hstat.base { width: clamp(90px, 11vw, 140px); } }
+.credits { margin-top: 8px; font-size: 8px; color: var(--dim); text-align: center; opacity: .75; }
+.credits b { color: #cfd2ff; }
