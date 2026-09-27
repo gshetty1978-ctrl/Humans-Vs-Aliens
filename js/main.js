@@ -50,6 +50,7 @@
     H.MenuScene.init();
     H.UI.init();
     H.Hud.init();
+    H.I18N.init();
     const fontReady = document.fonts && document.fonts.load ? document.fonts.load("12px 'Press Start 2P'") : Promise.resolve();
     H.Sprites.load(() => {
       fontReady.catch(() => {}).then(() => {

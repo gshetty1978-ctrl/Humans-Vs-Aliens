@@ -38,6 +38,15 @@
     const k = Math.min(w / H.G.W, h / H.G.H);
     c.style.width = Math.floor(H.G.W * k) + 'px';
     c.style.height = Math.floor(H.G.H * k) + 'px';
+    Hud.fitBank();
+  };
+
+  Hud.fitBank = function () {
+    const bank = $('bank'), hud = $('hud'), st = $('stage');
+    if (!bank || !hud || !st) return;
+    if (window.matchMedia('(max-aspect-ratio: 1/1)').matches) { bank.style.maxWidth = ''; return; }
+    const room = st.clientWidth - hud.offsetWidth - 22;
+    if (room > 120) bank.style.maxWidth = room + 'px';
   };
 
   Hud.begin = function (level, ids) {
@@ -118,7 +127,7 @@
     $('battle').classList.add('sandbox');
     const keys = Object.keys(H.ALIENS).filter(k => k !== 'mothership');
     const list = SB_ORDER.filter(k => H.ALIENS[k]).concat(keys.filter(k => !SB_ORDER.includes(k))).concat(['mothership']);
-    const chip = t => '<button class="sb-chip" data-sp="' + t + '" title="' + H.ALIENS[t].name + '"><img src="' + H.Sprites.alienURL(t) + '" alt="" draggable="false"><span>' + H.ALIENS[t].name.split(' ')[0] + '</span></button>';
+    const chip = t => '<button class="sb-chip" data-sp="' + t + '" title="' + H.ALIENS[t].name + '"><img src="' + H.Sprites.alienURL(t) + '" alt="" draggable="false"><span>' + H.chipName(t) + '</span></button>';
     const p = document.createElement('div');
     p.id = 'sbox';
     p.innerHTML = '<div class="sb-bar"><button class="sb-b" data-sb="exit">⏏ EXIT</button><button class="sb-b" data-sb="wprev">◀</button><span class="sb-w" id="sbWorld"></span><button class="sb-b" data-sb="wnext">▶</button>' +
@@ -304,6 +313,7 @@
     tray.addEventListener('mouseleave', Hud.hideTip);
     window.addEventListener('resize', Hud.fit);
     if (window.ResizeObserver) new ResizeObserver(Hud.fit).observe($('field'));
+    if (window.ResizeObserver) new ResizeObserver(Hud.fitBank).observe($('hud'));
     window.addEventListener('keydown', e => {
       const b = Hud.battle;
       if (!b || $('battle').hidden) return;

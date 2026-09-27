@@ -18,6 +18,7 @@
     for (let j = -ry; j <= ry; j++) { const half = Math.round(rx * Math.sqrt(Math.max(0, 1 - (j * j) / (ry * ry)))); g.fillRect(Math.round(x - half), Math.round(y + j), half * 2, 1); }
   }
   function txt(s, x, y, size, col, align, shadow) {
+    s = H.tr ? H.tr(s) : s;
     g.font = size + 'px ' + FONT; g.textAlign = align || 'left'; g.textBaseline = 'alphabetic';
     if (shadow) { g.fillStyle = shadow; g.fillText(s, Math.round(x + Math.max(1, size / 8)), Math.round(y + Math.max(1, size / 8))); }
     g.fillStyle = col; g.fillText(s, Math.round(x), Math.round(y));
@@ -323,7 +324,7 @@
     if (finishing) cx.globalAlpha = clamp(1 - (ts - finishing) / 400, 0, 1);
     cx.drawImage(buf, Math.round((cw - dw) / 2 + sx * s), Math.round((ch - dh) / 2 + sy * s), Math.round(dw), Math.round(dh));
     cx.globalAlpha = 1;
-    if (ch > cw) { cx.font = Math.max(9, Math.round(cw / 28)) + 'px ' + FONT; cx.textAlign = 'center'; cx.fillStyle = '#ffe14a'; cx.fillText('ROTATE YOUR PHONE', cw / 2, (ch + dh) / 2 + Math.max(30, cw / 8)); }
+    if (ch > cw) { cx.font = Math.max(9, Math.round(cw / 28)) + 'px ' + FONT; cx.textAlign = 'center'; cx.fillStyle = '#ffe14a'; cx.fillText(H.tr('ROTATE YOUR PHONE'), cw / 2, (ch + dh) / 2 + Math.max(30, cw / 8)); }
     raf = requestAnimationFrame(frame);
   }
 
@@ -350,7 +351,7 @@
       cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:5000;background:#000;cursor:pointer';
       document.body.appendChild(cv); cx = cv.getContext('2d');
       skipBtn = document.createElement('button');
-      skipBtn.textContent = 'SKIP ▶';
+      skipBtn.textContent = H.tr('SKIP') + ' ▶';
       skipBtn.style.cssText = "position:fixed;right:14px;bottom:14px;z-index:5001;font-family:" + FONT + ";font-size:10px;color:#fff;background:rgba(20,20,60,.75);border:2px solid #8a8fd8;padding:10px 12px;letter-spacing:1px";
       document.body.appendChild(skipBtn);
       skipBtn.addEventListener('click', skip); cv.addEventListener('click', skip);

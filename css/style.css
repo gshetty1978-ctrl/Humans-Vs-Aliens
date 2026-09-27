@@ -323,3 +323,31 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
 .itch-link { display: inline-block; margin-top: 12px; font-size: 9px; color: #fff; background: #fa5c5c; padding: 10px 14px; text-decoration: none; box-shadow: inset -3px -3px 0 #b83a3a, inset 3px 3px 0 #ff9a9a, 0 0 0 3px var(--edge); }
 .itch-link:active { transform: translateY(2px); }
 .itch-link { align-self: center; margin-bottom: 4px; }
+.langs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+
+/* ===== themed language dropdown ===== */
+.dd { position: relative; display: inline-block; margin-top: 10px; min-width: 190px; z-index: 8; }
+.dd-btn { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; font-size: 11px; padding: 11px 14px; color: #fff; background: #1d1d5a; border: 0;
+  box-shadow: inset -3px -3px 0 #10103a, inset 3px 3px 0 #3a3ab0, 0 0 0 3px var(--edge); }
+.dd-btn::before { content: '🌐'; font-size: 13px; }
+.dd-btn .dd-cur { flex: 1; text-align: left; }
+.dd-btn i { font-style: normal; font-size: 9px; color: var(--yel); transition: transform .15s; }
+.dd.open .dd-btn i { transform: rotate(180deg); }
+.dd-btn:active { transform: translateY(2px); }
+.dd-list { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: #0d0d33; padding: 4px; flex-direction: column; gap: 3px;
+  box-shadow: inset 0 0 0 3px #2f2f8f, 0 0 0 3px var(--edge), 0 8px 0 rgba(0, 0, 0, .35); max-height: 62vh; overflow-y: auto; }
+.dd.up .dd-list { top: auto; bottom: calc(100% + 6px); }
+.dd.open .dd-list { display: flex; }
+.dd-item { font-size: 10px; text-align: left; padding: 10px 12px; color: #cfd2ff; background: transparent; border: 0; }
+.dd-item:hover { background: #2a2a8a; color: #fff; }
+.dd-item.on { color: var(--grn); }
+.dd-item.on::before { content: '▶ '; color: var(--yel); }
+html[lang="hi"] *, html[lang="mr"] * { font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'Kohinoor Devanagari', 'Devanagari Sangam MN', 'Press Start 2P', sans-serif !important; letter-spacing: 0 !important; }
+html[lang="hi"] .muted, html[lang="mr"] .muted, html[lang="hi"] .desc, html[lang="mr"] .desc, html[lang="hi"] .ability, html[lang="mr"] .ability, html[lang="hi"] .role, html[lang="mr"] .role,
+html[lang="hi"] .stats span, html[lang="mr"] .stats span, html[lang="hi"] #cardTip, html[lang="mr"] #cardTip, html[lang="hi"] .rewards div, html[lang="mr"] .rewards div, html[lang="hi"] .tag, html[lang="mr"] .tag,
+html[lang="hi"] #sbox .sb-hint, html[lang="mr"] #sbox .sb-hint, html[lang="hi"] .alien-chip, html[lang="mr"] .alien-chip { font-size: 11px !important; line-height: 1.5; }
+html[lang="hi"] .btn, html[lang="mr"] .btn, html[lang="hi"] .dd-btn, html[lang="mr"] .dd-btn, html[lang="hi"] .dd-item, html[lang="mr"] .dd-item { font-size: 13px; }
+#battle #hud { flex-wrap: nowrap; }
+#battle .hstat.wave { white-space: nowrap; }
+#battle .hstat.base { width: clamp(110px, 12vw, 190px); }
+@media (max-width: 900px) { #battle .hstat.base .ico { display: none; } #battle .hstat.base { width: clamp(90px, 11vw, 140px); } }

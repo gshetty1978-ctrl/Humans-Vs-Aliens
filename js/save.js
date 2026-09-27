@@ -3,7 +3,7 @@
   const def = () => ({
     bonusEnergy: 0, coins: 100, completed: {}, stars: {}, unlocked: ['ryan', 'lucy'], upgrades: {}, tech: 0, xp: 0,
     achievements: {}, stats: { kills: 0, energy: 0, bosses: 0 },
-    settings: { sfx: true, volume: 0.6, music: true, musicVol: 0.6, shake: true, dmgNumbers: true }, selected: ['ryan', 'lucy']
+    settings: { lang: null, sfx: true, volume: 0.6, music: true, musicVol: 0.6, shake: true, dmgNumbers: true }, selected: ['ryan', 'lucy']
   });
   function merge(a, b) {
     for (const k in b) {

@@ -50,12 +50,17 @@
 
   const back = (to) => '<button class="btn small" data-act="' + (to || 'menu') + '">◀ BACK</button>';
 
+  function ddLang(up) {
+    return '<div class="dd' + (up ? ' up' : '') + '"><button class="dd-btn" data-act="ddtoggle"><span class="dd-cur">' + H.I18N.name() + '</span><i>▼</i></button><div class="dd-list">' +
+      H.LANGS.map(l => '<button class="dd-item' + (l.id === H.I18N.lang ? ' on' : '') + '" data-act="setlang" data-l="' + l.id + '">' + l.name + '</button>').join('') + '</div></div>';
+  }
+
   UI.screen_menu = function () {
     const d = S().data;
     return '<div class="wrap"><h1 class="title">HUMANS<span class="vs">VS</span>ALIENS</h1><div class="subtitle">DEFEND EARTH. ONE LANE AT A TIME.</div>' +
       '<div class="menu"><button class="btn play" data-act="play">▶ PLAY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="aliens">👽 ALIENS</button><button class="btn" data-act="sandbox">🧪 SANDBOX</button>' +
       '<button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="achievements">🏆 ACHIEVEMENTS</button><button class="btn" data-act="settings">⚙ SETTINGS</button></div>' +
-      '<a class="itch-link" href="https://cricketlover.itch.io/humans-vs-aliens" target="_blank" rel="noopener">🎮 PLAY ON ITCH.IO</a>' +
+      '<a class="itch-link" href="https://cricketlover.itch.io/humans-vs-aliens" target="_blank" rel="noopener">🎮 PLAY ON ITCH.IO</a>' + ddLang(true) +
       '<div class="menu-foot"><span class="pill">RANK LV ' + playerLevel() + '</span><span class="pill">★ ' + totalStars() + ' / ' + H.LEVELS.length * 3 + '</span><span class="pill">🔧 ' + d.tech + ' TECH</span><span class="pill">🪙 ' + d.coins + '</span></div></div>';
   };
 
@@ -80,7 +85,7 @@
       '<div class="muted">BOSS: ' + (w.boss === 'mothership' ? 'THE MOTHERSHIP' : H.ALIENS[w.boss].name) + '</div><div class="alien-strip">' + chips + '</div></div></div>';
   };
   function alienChip(t) {
-    return '<div class="alien-chip"><img src="' + H.Sprites.alienURL(t) + '" alt=""><span>' + H.ALIENS[t].name.split(' ')[0] + '</span></div>';
+    return '<div class="alien-chip"><img src="' + H.Sprites.alienURL(t) + '" alt=""><span>' + H.chipName(t) + '</span></div>';
   }
 
   function defaultPick() {
@@ -189,6 +194,7 @@
       tog('music', '🎵 MUSIC') +
       '<div class="row"><span>🎶 MUSIC VOLUME</span><input type="range" min="0" max="100" value="' + Math.round(s.musicVol * 100) + '" id="musicRange"></div>' +
       tog('shake', '📳 SCREEN SHAKE') + tog('dmgNumbers', '💬 DAMAGE NUMBERS') +
+      '<div class="row"><span>🌐 LANGUAGE</span>' + ddLang(false) + '</div>' +
       '<div class="row"><span>⚠️ ERASE ALL PROGRESS</span><button class="btn small red" data-act="reset">RESET PROGRESS</button></div></div></div>';
   };
 
@@ -240,6 +246,8 @@
     switch (act) {
       case 'menu': UI.show('menu'); break;
       case 'play': UI.show('levels', {}); break;
+      case 'ddtoggle': { const d = el.closest('.dd'); const was = d.classList.contains('open'); document.querySelectorAll('.dd.open').forEach(x => x.classList.remove('open')); if (!was) d.classList.add('open'); break; }
+      case 'setlang': H.I18N.set(el.dataset.l); H.Save.save(); UI.show(UI.current); break;
       case 'sandbox': UI.hideScreen(); H.Hud.beginSandbox(1); break;
       case 'levels': UI.show('levels', {}); break;
       case 'humans': UI.show('humans'); break;
@@ -299,6 +307,7 @@
 
   UI.init = function () {
     document.addEventListener('click', e => {
+      if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(x => x.classList.remove('open'));
       const el = e.target.closest('[data-act]');
       if (!el || el.disabled) return;
       H.Sound.unlock();
