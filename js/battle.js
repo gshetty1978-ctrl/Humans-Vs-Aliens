@@ -819,7 +819,8 @@
       }
       if (m.state === 'dying') {
         m.deathT += dt;
-        if (Math.random() < dt * 14) this.explosion(m.x + rand(-170, 170), m.y + rand(-50, 50), rand(0.5, 1));
+        if (m.deathT < 3 && Math.random() < dt * 14) this.explosion(m.x + rand(-170, 170), m.y + rand(-50, 50), rand(0.5, 1));
+        if (m.deathT >= 3.2) { m.state = 'gone'; this.ms = null; if (this.boss === m) this.boss = null; }
         m.y += 14 * dt; this.addShake(3);
         return;
       }
@@ -1230,7 +1231,7 @@
 
     drawMs(ctx) {
       const m = this.ms;
-      if (!m) return;
+      if (!m || m.state === 'gone') return;
       const spr = H.Sprites.alien('mothership', 0);
       const w = spr.width * 2, h = spr.height * 2;
       const x = Math.round(m.x - w / 2), y = Math.round(m.y - h / 2);
