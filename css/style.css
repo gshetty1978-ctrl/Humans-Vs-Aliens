@@ -259,10 +259,12 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
 #battle[hidden] { display: none; }
 #bgFill { position: absolute; inset: -24px; background-size: cover; background-position: center; filter: blur(9px) brightness(.72); }
 #battle #stage { position: absolute; inset: 0; display: block; background: transparent; }
+#topRow { position: absolute; top: 0; left: 0; right: 0; z-index: 4; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; pointer-events: none; }
+#topRow > * { pointer-events: auto; }
 #battle #field { position: absolute; inset: 0; align-items: center; justify-content: center; }
 #battle #game { box-shadow: none; }
 
-#battle #bank { position: absolute; top: 0; left: 0; z-index: 4; display: flex; align-items: stretch; gap: 5px; padding: 6px 9px 7px 7px; max-width: calc(100% - 270px); overflow-x: auto; overflow-y: hidden;
+#battle #bank { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: stretch; gap: 5px; padding: 6px 9px 7px 7px; overflow-x: auto; overflow-y: hidden;
   background: linear-gradient(180deg, #9a6a34 0, #6e4620 55%, #5a3818 100%); border-radius: 0 0 12px 0; box-shadow: inset 0 0 0 2px #c99a58, inset 0 -3px 0 #3a2410, 0 0 0 3px #2a1808, 0 5px 0 rgba(0, 0, 0, .35); }
 #battle #bank .hstat.energy { flex: none; flex-direction: column; justify-content: center; align-items: center; gap: 0; min-width: calc(var(--cw) * 1.15); min-height: calc(var(--cw) * 1.35); padding: 2px 4px; background: linear-gradient(180deg, #fbf3cf, #ecdca0); color: #2a1600; border-radius: 3px; box-shadow: inset 0 0 0 2px #fff9e2, 0 0 0 2px #3a2a10; }
 #battle #bank .hstat.energy .ico { font-size: calc(var(--cw) * .5); line-height: 1; }
@@ -282,15 +284,16 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
 #battle .tcard.sel::after { background: rgba(0, 0, 0, .42); }
 #battle #btnCollect { margin-left: 4px; min-width: calc(var(--cw) * 1.35); max-width: none; font-size: clamp(6px, .8vw, 9px); }
 
-#battle #hud { position: absolute; top: 6px; right: 8px; left: auto; z-index: 4; padding: 0; gap: 6px; background: transparent; box-shadow: none; align-items: center; }
+#battle #hud { position: relative; flex: 0 0 auto; margin: 6px 8px 0 0; padding: 0; gap: 6px; background: transparent; box-shadow: none; align-items: center; }
 #battle .hstat.wave, #battle .hstat.base { flex: none; min-width: 0; min-height: 34px; background: rgba(8, 8, 36, .78); font-size: clamp(7px, .9vw, 11px); padding: 4px 9px; }
 #battle .hstat.base { width: clamp(130px, 14vw, 200px); }
 #battle .hbtn { min-width: 36px; height: 36px; font-size: 11px; }
 #battle #bossBar { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: min(460px, 60vw); z-index: 4; border-radius: 3px; background: rgba(42, 10, 42, .85); box-shadow: 0 0 0 2px #000; }
 
 @media (max-aspect-ratio: 1/1) {
-  #battle #bank { max-width: 100%; right: 0; border-radius: 0; }
-  #battle #hud { top: auto; bottom: 8px; }
+  #topRow { flex-wrap: wrap; }
+  #battle #bank { flex: 1 1 100%; border-radius: 0; }
+  #battle #hud { margin: 4px 8px 0 auto; }
   #battle #bossBar { bottom: 56px; }
 }
 @media (max-height: 520px) {
@@ -299,7 +302,6 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
   #battle .tcard .k { display: none; }
   #battle .hbtn { min-width: 30px; height: 30px; font-size: 9px; }
   #battle .hstat.wave, #battle .hstat.base { min-height: 28px; padding: 3px 6px; }
-  #battle #bank { max-width: calc(100% - 230px); }
 }
 #battle .tcard .rc { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(10, 10, 20, .68); pointer-events: none; z-index: 2; border-bottom: 2px solid rgba(255, 255, 255, .25); }
 #battle .tcard.cool { filter: none; }
