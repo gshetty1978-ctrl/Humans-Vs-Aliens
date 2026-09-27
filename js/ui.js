@@ -62,7 +62,7 @@
       '<button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="achievements">🏆 ACHIEVEMENTS</button><button class="btn" data-act="settings">⚙ SETTINGS</button></div>' +
       '<a class="itch-link" href="https://cricketlover.itch.io/humans-vs-aliens" target="_blank" rel="noopener">🎮 PLAY ON ITCH.IO</a>' + ddLang(true) +
       '<div class="menu-foot"><span class="pill">RANK LV ' + playerLevel() + '</span><span class="pill">★ ' + totalStars() + ' / ' + H.LEVELS.length * 3 + '</span><span class="pill">🔧 ' + d.tech + ' TECH</span><span class="pill">🪙 ' + d.coins + '</span></div>' +
-      '<div class="credits">Written &mdash; A <b>Kiaan Ganesh Shetty</b> Creation &middot; 10 days in the making</div></div>';
+      '<div class="credits">A <b>Kiaan Ganesh Shetty</b> Creation &middot; 10 days in the making</div></div>';
   };
 
   UI.screen_levels = function (arg) {
