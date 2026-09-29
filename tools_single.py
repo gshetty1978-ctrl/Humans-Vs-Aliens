@@ -21,13 +21,18 @@ html = rd('index.html')
 css = rd('css/style.css').replace("url('../fonts/PressStart2P-Regular.ttf')", "url('%s')" % datauri('fonts/PressStart2P-Regular.ttf', 'font/ttf'))
 assets = {}
 for f in sorted(os.listdir('assets')):
-    if f.endswith('.png') and not f.startswith('sheet_source') and not f.startswith('icon'):
+    if f.endswith('.png') and not f.startswith('sheet_source'):
         assets['assets/' + f] = datauri('assets/' + f, 'image/png')
     elif f.endswith('.mp3'):
         assets['assets/' + f] = datauri('assets/' + f, 'audio/mpeg')
+    elif f.endswith('.ico'):
+        assets['assets/' + f] = datauri('assets/' + f, 'image/x-icon')
 
 html = re.sub(r'<link rel="stylesheet" href="css/style.css">', lambda m: '<style>\n' + css + '\n</style>', html)
-html = re.sub(r'<link rel="icon"[^>]*>', '<link rel="icon" href="%s">' % assets['assets/ryan.png'], html)
+html = re.sub(r'<link rel="icon"[^>]*href="assets/icon\.ico"[^>]*>', '<link rel="icon" href="%s" sizes="any">' % assets['assets/icon.ico'], html)
+html = re.sub(r'<link rel="icon"[^>]*href="assets/icon-192\.png"[^>]*>', '<link rel="icon" type="image/png" sizes="192x192" href="%s">' % assets['assets/icon-192.png'], html)
+html = re.sub(r'<link rel="icon"[^>]*href="assets/icon-512\.png"[^>]*>', '<link rel="icon" type="image/png" sizes="512x512" href="%s">' % assets['assets/icon-512.png'], html)
+html = re.sub(r'<link rel="apple-touch-icon"[^>]*>', '<link rel="apple-touch-icon" href="%s">' % assets['assets/icon-192.png'], html)
 html = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>', '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; img-src data:; font-src data:; media-src data: blob:; connect-src \'none\'">', html)
 
 def inline_script(m):
