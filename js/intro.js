@@ -218,28 +218,35 @@
     if (pulse > 0.4) txt('⚠ ALERT', 196, 56, 10, '#ff5a5a', 'left', '#000');
     px(200, 178, 210, 8, '#3a4a80'); px(210, 186, 190, 14, '#232c50');
     const SUIT = [[0, 110, 'max'], [1, 250, 'titan'], [2, 355, 'ryan'], [3, 445, 'tom'], [4, 520, 'sam']];
-    const suited = lt > 1.3;
-    if (!suited) {
-      const walkK = ease(clamp(lt / 1.0, 0, 1));
-      SUIT.forEach(([civId, x, id], i) => {
-        const fromLeft = civId % 2 === 0, startX = fromLeft ? x - 150 : x + 150;
-        const cx0 = lerp(startX, x, walkK);
-        civ(civId, cx0, 300, { t: lt * 3 + i, walk: true, flip: !fromLeft });
-      });
-      if (lt > 0.95 && lt < 1.2) { const fk = 1 - Math.abs((lt - 1.075) / 0.125); g.globalAlpha = 0.7 * fk; SUIT.forEach(([, x]) => ell(x, 280, 30 + 40 * fk, 60 + 50 * fk, '#ffffff')); g.globalAlpha = 1; }
-    } else {
-      const grab = lt > 1.9;
-      SUIT.forEach(([, x, id], i) => human(id, x, 300, { t: (id === 'max' ? lt : lt * 1.3) + i, sc: id === 'max' ? 0.8 : 0.72, anim: grab ? 'special' : 'idle', fps: id === 'max' ? 2 : 3 }));
-    }
-    if (lt > 0.95 && lt < 1.1) flash = 0.4;
-    const on = lt > 2.9;
+    const WALK_END = 2.2, SUIT_H = 130;
+    SUIT.forEach(([civId, x, id], i) => {
+      const suitAt = WALK_END + i * 0.12, sweepK = clamp((lt - suitAt) / 0.9, 0, 1);
+      if (lt < WALK_END) {
+        const walkK = ease(clamp(lt / WALK_END, 0, 1));
+        const fromLeft = civId % 2 === 0, startX = fromLeft ? x - 170 : x + 170;
+        civ(civId, lerp(startX, x, walkK), 300, { t: lt * 2.2 + i, walk: true, flip: !fromLeft });
+        return;
+      }
+      if (sweepK <= 0) { civ(civId, x, 300, { t: lt * 0.6 + i, flip: false }); return; }
+      const grab = lt > suitAt + 1.6;
+      if (sweepK >= 1) { human(id, x, 300, { t: (id === 'max' ? lt : lt * 1.3) + i, sc: id === 'max' ? 0.8 : 0.72, anim: grab ? 'special' : 'idle', fps: id === 'max' ? 2 : 3 }); return; }
+      civ(civId, x, 300, { t: lt * 0.6 + i, flip: false });
+      const revealH = sweepK * SUIT_H, scanY = 300 - revealH;
+      g.save(); g.beginPath(); g.rect(x - 60, scanY, 120, revealH + 4); g.clip();
+      human(id, x, 300, { t: (id === 'max' ? lt : lt * 1.3) + i, sc: id === 'max' ? 0.8 : 0.72, anim: 'idle', fps: id === 'max' ? 2 : 3 });
+      g.restore();
+      g.globalAlpha = 0.85; px(x - 60, scanY - 2, 120, 3, '#eaffff'); g.globalAlpha = 1;
+      for (let k = 0; k < 3; k++) { const sa = (lt * 9 + i * 2 + k) % 1; px(x - 50 + sa * 100, scanY - 4 - sa * 6, 3, 3, '#aef8ff'); }
+    });
+    if (lt > WALK_END - 0.05 && lt < WALK_END + 0.15) flash = 0.35;
+    const on = lt > 4.1;
     const m = H.Sprites.reactor && H.Sprites.reactor[Math.floor(lt * 4) % 2];
     if (m) { const mw = m.width * 3, mh = m.height * 3; g.drawImage(m, Math.round(600 - mw / 2), Math.round(300 - mh), mw, mh); if (on) { g.globalAlpha = 0.25 + 0.15 * pulse; ell(600, 300 - mh / 2, 44, 60, '#8dff7a'); g.globalAlpha = 1; } }
     human('eli', 566, 316, { t: lt, sc: 0.6, anim: on ? 'special' : 'idle', fps: 4, flip: false });
     human('maya', 636, 316, { t: lt + 1, sc: 0.6, anim: on ? 'special' : 'idle', fps: 4, flip: true });
     if (on) { for (let i = 0; i < 4; i++) { g.strokeStyle = '#eaffd0'; g.lineWidth = 2; g.beginPath(); let x = 600, y = 250; g.moveTo(x, y); for (let k = 0; k < 5; k++) { x += (Math.random() - 0.5) * 30; y -= 12 + Math.random() * 6; g.lineTo(x, y); } g.stroke(); } }
-    if (lt > 3.9) { const full = "Then we'll save it.", n = Math.min(full.length, Math.floor((lt - 3.9) * 14)); px(30, HH - 76, 580, 54, '#0a0a1a'); px(30, HH - 76, 580, 3, '#54c7ff'); px(30, HH - 25, 580, 3, '#54c7ff'); txt('COMMANDER MAX', 44, HH - 56, 8, '#7ffcff'); txt(full.slice(0, n), 44, HH - 36, 12, '#ffffff'); }
-    if (lt > 2.9 && lt < 3.05) flash = 0.5;
+    if (lt > 4.5) { const full = "Then we'll save it.", n = Math.min(full.length, Math.floor((lt - 4.5) * 16)); px(30, HH - 76, 580, 54, '#0a0a1a'); px(30, HH - 76, 580, 3, '#54c7ff'); px(30, HH - 25, 580, 3, '#54c7ff'); txt('COMMANDER MAX', 44, HH - 56, 8, '#7ffcff'); txt(full.slice(0, n), 44, HH - 36, 12, '#ffffff'); }
+    if (lt > 4.1 && lt < 4.25) flash = 0.5;
   }
 
   const HUM = [
