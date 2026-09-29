@@ -217,7 +217,7 @@
     for (let y = 36; y < 174; y += 3) px(186, y, 238, 1, 'rgba(0,0,0,0.25)');
     if (pulse > 0.4) txt('⚠ ALERT', 196, 56, 10, '#ff5a5a', 'left', '#000');
     px(200, 178, 210, 8, '#3a4a80'); px(210, 186, 190, 14, '#232c50');
-    const SUIT = [[0, 130, 'max'], [1, 400, 'titan'], [2, 470, 'ryan'], [3, 512, 'tom'], [4, 554, 'sam']];
+    const SUIT = [[0, 110, 'max'], [1, 250, 'titan'], [2, 355, 'ryan'], [3, 445, 'tom'], [4, 520, 'sam']];
     const suited = lt > 1.3;
     if (!suited) {
       const walkK = ease(clamp(lt / 1.0, 0, 1));
