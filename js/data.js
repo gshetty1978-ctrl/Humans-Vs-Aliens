@@ -10,7 +10,14 @@ window.HVA.asset = p => (window.HVA_ASSETS && window.HVA_ASSETS[p]) || p;
     { id: 'eli', name: 'ENGINEER ELI', icon: '🤖', role: 'Engineer / Support', cost: 200, hp: 150, dmg: 15, cd: 1.5, range: 4, rangeLabel: 'Medium', ability: 'Builds a drone (75 HP, 10 dmg, fast fire) every 12s.', desc: 'If it can be built, Eli can weaponize it.', price: 650, proj: 'blue', scale: 2 },
     { id: 'priya', name: 'PLASMA PRIYA', icon: '🟣', role: 'Area Damage', cost: 250, hp: 130, dmg: 60, cd: 2.0, range: 7, rangeLabel: 'Long', ability: 'Plasma orbs explode, hitting nearby aliens.', desc: 'Why shoot one alien when you can hit five?', price: 800, proj: 'plasma', scale: 2 },
     { id: 'max', name: 'COMMANDER MAX', icon: '👑', role: 'Ultimate Defender', cost: 400, hp: 500, dmg: 120, cd: 2.0, range: 9, rangeLabel: 'Long', ability: 'Ultimate missile hits every alien in the lane (20s cooldown).', desc: 'The last line of defense.', price: 1200, proj: 'missile', scale: 2 },
-    { id: 'chronos', name: 'CHRONOS', icon: '🔰', role: 'Heavy-Armored Support', cost: 300, hp: 450, dmg: 25, cd: 2.2, range: 1.3, rangeLabel: 'Short', ability: 'Periodically shields itself and nearby humans, reducing damage taken.', desc: 'A wall of purple steel and borrowed time.', price: 1500, proj: 'melee', scale: 1.7 }
+    { id: 'chronos', name: 'CHRONOS', icon: '🔰', role: 'Heavy-Armored Support', cost: 300, hp: 450, dmg: 25, cd: 2.2, range: 1.3, rangeLabel: 'Short', ability: 'Periodically shields itself and nearby humans, reducing damage taken.', desc: 'A wall of purple steel and borrowed time.', price: 1500, proj: 'melee', scale: 1.7 },
+    { id: 'neon', name: 'NEON', icon: '🗡️', role: 'Stealth Assassin', cost: 275, hp: 140, dmg: 18, cd: 1.3, range: 1.2, rangeLabel: 'Short', ability: 'Strikes twice with every attack.', desc: 'Gone before the echo hits.', price: 1600, proj: 'melee', scale: 1.7 },
+    { id: 'goliath', name: 'GOLIATH', icon: '🦾', role: 'Mech-Piloted Tank', cost: 350, hp: 600, dmg: 18, cd: 0.5, range: 6, rangeLabel: 'Medium', ability: 'Rapid-fire cannons, plus a missile swarm every 12s.', desc: 'A one-mech army.', price: 1800, proj: 'blue', scale: 1.8 },
+    { id: 'phoenix', name: 'PHOENIX', icon: '🔥', role: 'Flamethrower Specialist', cost: 275, hp: 160, dmg: 22, cd: 1.4, range: 3.5, rangeLabel: 'Medium', ability: 'Flame bursts scorch the target and nearby aliens.', desc: 'Ash to ash, rust to rust.', price: 1650, proj: 'plasma', scale: 1.7 },
+    { id: 'maven', name: 'MAVEN', icon: '🔧', role: 'Tech-Engineer 2', cost: 250, hp: 140, dmg: 10, cd: 2.0, range: 4, rangeLabel: 'Medium', ability: 'Repairs the most wounded nearby human for a large chunk of HP.', desc: 'Every dent has a fix.', price: 1550, proj: 'pulse', scale: 1.7 },
+    { id: 'valkyrie', name: 'VALKYRIE', icon: '🪂', role: 'Jump-Pack Soldier', cost: 300, hp: 150, dmg: 45, cd: 1.0, range: 8, rangeLabel: 'Long', ability: 'Fast, precise shots at long range.', desc: 'Drops in, never drops out.', price: 1750, proj: 'laser', scale: 1.7 },
+    { id: 'titan', name: 'TITAN', icon: '💪', role: 'Super-Soldier', cost: 380, hp: 400, dmg: 90, cd: 2.6, range: 7, rangeLabel: 'Long', ability: 'Charged shots hit hard; a ground slam every 14s.', desc: 'One-man army, zero doubts.', price: 2000, proj: 'sniper', scale: 1.8 },
+    { id: 'cobalt', name: 'COBALT', icon: '🎖️', role: 'Special-Ops Leader', cost: 320, hp: 180, dmg: 35, cd: 1.4, range: 7, rangeLabel: 'Long', ability: 'Precise rifle fire; periodically boosts nearby humans\' damage.', desc: 'Command isn\'t given. It\'s earned.', price: 1900, proj: 'gold', scale: 1.7 }
   ];
 
   H.REACTOR = { id: 'reactor', price: 0, name: 'NUCLEAR REACTOR', icon: '☢️', role: 'Energy Generator', cost: 75, hp: 120, dmg: 0, cd: 1, range: 0, rangeLabel: 'None', ability: 'Drops a 25 ⚡ energy cell every 9s.', desc: 'Definitely safe. Probably.' };
@@ -171,6 +178,13 @@ window.HVA.asset = p => (window.HVA_ASSETS && window.HVA_ASSETS[p]) || p;
     eli: 'SPECIAL: stronger, tougher drones',
     priya: 'SPECIAL: bigger plasma blast radius',
     max: 'SPECIAL: ultimate recharges 2s faster per level',
-    chronos: 'SPECIAL: shield reduces more damage, recharges faster per level'
+    chronos: 'SPECIAL: shield reduces more damage, recharges faster per level',
+    neon: 'SPECIAL: strikes hit harder per level',
+    goliath: 'SPECIAL: bigger, more frequent missile swarms',
+    phoenix: 'SPECIAL: bigger flame burst radius',
+    maven: 'SPECIAL: heals more per level',
+    valkyrie: 'SPECIAL: fires faster per level',
+    titan: 'SPECIAL: ground slam hits harder, recharges faster',
+    cobalt: 'SPECIAL: bigger damage boost, recharges faster'
   };
 })(window.HVA);

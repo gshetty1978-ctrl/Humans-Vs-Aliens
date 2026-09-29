@@ -3,7 +3,7 @@
   const FIELD_R = G.GX + G.COLS * G.CW;
   const AL_SCALE = 1.5;
   const AP = { sniper: 0.6, gold: 0.3, plasma: 0.3, laser: 0.15, ult: 1 };
-  const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, chronos: 16, reactor: 7.5, firewall: 20, dynamite: 30 };
+  const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, chronos: 16, neon: 15, goliath: 18, phoenix: 15, maven: 14, valkyrie: 16, titan: 20, cobalt: 17, reactor: 7.5, firewall: 20, dynamite: 30 };
   H.RECHARGE = RECHARGE;
   const BOSS_MULT = { commander: 2, shield: 4, prime: 1.5, frosttitan: 3, magmawyrm: 3, kraken: 3, voidtitan: 4, swamphydra: 4, stormcolossus: 4, pharaoh: 4, omegaprime: 5 };
   const BURST = {
@@ -135,7 +135,9 @@
         id: d.id, def: d, up, row, col, x: cellCX(col), hp, maxhp: hp, cdT: 0.5, animT: Math.random() * 6, atk: 0, hit: 0, dead: false,
         deathT: 0, disabled: 0, pend: [], healT: 3, buildT: d.id === 'eli' ? 3.5 : 0, building: 0, drone: null, ultT: d.id === 'max' ? 6 : 0,
         ultReady: false, aim: 0, spawnT: 0.35, zapFx: 0, shieldFlash: 0, ultAnim: 0, prodT: 5, fuseT: d.id === 'dynamite' ? 1.5 : 0,
-        shieldT: d.id === 'chronos' ? 4 : 0, shieldFx: 0, dmgReduceT: 0, dmgReducePct: 0
+        shieldT: d.id === 'chronos' ? 4 : 0, shieldFx: 0, dmgReduceT: 0, dmgReducePct: 0,
+        swarmT: d.id === 'goliath' ? 5 : 0, slamT: d.id === 'titan' ? 6 : 0, buffT: d.id === 'cobalt' ? 5 : 0,
+        buffFx: 0, dmgBuffT: 0, dmgBuffPct: 0
       };
       this.humans.push(h); this.cells[row][col] = h;
       this.stats.placed++;
@@ -449,7 +451,8 @@
 
     fire(h, target) {
       const d = h.def, up = h.up;
-      const dmg = H.stat(d, up, 'dmg');
+      let dmg = H.stat(d, up, 'dmg');
+      if (h.dmgBuffT > 0) dmg = Math.round(dmg * (1 + h.dmgBuffPct));
       const spc = up.spc || 0;
       h.atk = 0.2;
       switch (h.id) {
@@ -496,6 +499,31 @@
             }
           } });
           break;
+        case 'neon':
+          h.atk = 0.25;
+          [0.1, 0.26].forEach(dl => h.pend.push({ t: dl, fn: () => {
+            const t = this.findTarget(h, H.stat(d, up, 'range') * G.CW);
+            H.Sound.hit();
+            if (t) {
+              const tx = t === this.ms ? t.x - 180 : t.x;
+              this.burst(tx, footY(h.row) - 40, 6, ['#b060ff', '#ffffff', '#7a30d0'], 70, 0, 0.3, 3);
+              if (t === this.ms) this.hurtMs(dmg); else this.hurtAlien(t, dmg, false, 0.15);
+            }
+          } }));
+          break;
+        case 'goliath': this.proj(h, 'blue', dmg, 420); H.Sound.pistol(); break;
+        case 'phoenix': this.proj(h, 'plasma', dmg, 300, { aoe: G.CW * 0.75 * (1 + 0.1 * spc) }); H.Sound.plasma(); break;
+        case 'maven': this.proj(h, 'pulse', dmg, 320); H.Sound.pistol(); break;
+        case 'valkyrie': this.proj(h, 'laser', dmg, 620 + spc * 30); H.Sound.laser(); break;
+        case 'titan': {
+          h.aim = 0.4;
+          h.pend.push({ t: 0.4, fn: () => {
+            this.proj(h, 'sniper', dmg, 1100);
+            H.Sound.laser(); this.addShake(3); h.atk = 0.3; h.atkMax = 0.3;
+          } });
+          break;
+        }
+        case 'cobalt': this.proj(h, 'gold', dmg, 440); H.Sound.plasma(); break;
       }
       h.atkMax = h.atk;
     }
@@ -506,6 +534,7 @@
       h.spawnT = Math.max(0, h.spawnT - dt);
       h.atk = Math.max(0, h.atk - dt); h.hit = Math.max(0, h.hit - dt); h.shieldFlash = Math.max(0, h.shieldFlash - dt);
       h.ultAnim = Math.max(0, h.ultAnim - dt); h.zapFx = Math.max(0, h.zapFx - dt); h.dmgReduceT = Math.max(0, (h.dmgReduceT || 0) - dt);
+      h.dmgBuffT = Math.max(0, (h.dmgBuffT || 0) - dt);
       for (const p of h.pend) p.t -= dt;
       const ready = h.pend.filter(p => p.t <= 0); h.pend = h.pend.filter(p => p.t > 0);
       ready.forEach(p => p.fn());
@@ -563,6 +592,55 @@
           if (any) { H.Sound.heal(); h.shieldFx = 0.7; this.burst(h.x, footY(h.row) - 50, 14, ['#a06bff', '#d0b0ff', '#ffffff'], 70, -20, 0.6, 3); this.floatText(h.x, footY(h.row) - 100, 'SHIELD UP!', '#a06bff', 9); }
         }
         h.shieldFx = Math.max(0, (h.shieldFx || 0) - dt);
+      }
+      if (h.id === 'goliath') {
+        h.swarmT -= dt;
+        if (h.swarmT <= 0) {
+          h.swarmT = Math.max(9, 12 - (up.spc || 0));
+          const t = this.findTarget(h, H.stat(d, up, 'range') * G.CW * 1.3);
+          if (t) {
+            const tx = t === this.ms ? t.x - 180 : t.x;
+            this.explosion(tx, footY(h.row) - 30, 1); H.Sound.plasma();
+            for (const a of this.aliens) { if (a.dead || a.row !== h.row) continue; if (Math.abs(a.x - tx) < G.CW * 1.3) this.hurtAlien(a, 45 * (1 + 0.15 * (up.spc || 0)), false, 0.2); }
+            if (t === this.ms) this.hurtMs(45 * (1 + 0.15 * (up.spc || 0)));
+            this.floatText(h.x, footY(h.row) - 100, 'MISSILE SWARM!', '#ff9a3d', 9);
+          }
+        }
+      }
+      if (h.id === 'titan') {
+        h.slamT -= dt;
+        if (h.slamT <= 0) {
+          h.slamT = Math.max(8, 14 - (up.spc || 0));
+          let any = false;
+          for (const a of this.aliens) { if (a.dead || Math.abs(a.row - h.row) > 1 || Math.abs(a.x - h.x) > G.CW * 2.2) continue; this.hurtAlien(a, 60 * (1 + 0.15 * (up.spc || 0)), false, 0.3); any = true; }
+          if (any) { H.Sound.explode(); this.addShake(6); this.explosion(h.x, footY(h.row) - 20, 1); this.floatText(h.x, footY(h.row) - 100, 'GROUND SLAM!', '#ffb04a', 9); }
+        }
+      }
+      if (h.id === 'cobalt') {
+        h.buffT -= dt;
+        if (h.buffT <= 0) {
+          h.buffT = Math.max(6, 11 - (up.spc || 0));
+          let any = false;
+          for (const o of this.humans) {
+            if (o.dead || o.isDrone || Math.abs(o.col - h.col) > 1 || Math.abs(o.row - h.row) > 1) continue;
+            o.dmgBuffT = 4; o.dmgBuffPct = 0.25 + 0.05 * (up.spc || 0); any = true;
+          }
+          if (any) { H.Sound.click(); h.buffFx = 0.7; this.burst(h.x, footY(h.row) - 50, 12, ['#7aa0ff', '#ffffff', '#3a5ad0'], 70, -20, 0.6, 3); this.floatText(h.x, footY(h.row) - 100, 'COMMAND!', '#7aa0ff', 9); }
+        }
+        h.buffFx = Math.max(0, (h.buffFx || 0) - dt);
+      }
+      if (h.id === 'maven') {
+        h.healT -= dt;
+        if (h.healT <= 0) {
+          h.healT = 5;
+          let best = null;
+          for (const o of this.humans) {
+            if (o.dead || o.isDrone || o === h || Math.abs(o.col - h.col) > 1 || Math.abs(o.row - h.row) > 1 || o.hp >= o.maxhp) continue;
+            if (!best || o.hp / o.maxhp < best.hp / best.maxhp) best = o;
+          }
+          if (best && this.healHuman(best, 60 * (1 + 0.2 * (up.spc || 0)))) { H.Sound.heal(); h.healFx = 0.7; }
+        }
+        h.healFx = Math.max(0, (h.healFx || 0) - dt);
       }
       if (h.id === 'eli') {
         if (h.building > 0) {
@@ -1088,6 +1166,11 @@
       if (h.dmgReduceT > 0 && !h.dead) {
         ctx.globalAlpha = 0.3 + 0.15 * Math.sin(this.time * 8);
         ctx.drawImage(H.Sprites.sil(frame, '#a06bff'), x, y);
+        ctx.globalAlpha = 1;
+      }
+      if (h.dmgBuffT > 0 && !h.dead) {
+        ctx.globalAlpha = 0.3 + 0.15 * Math.sin(this.time * 8);
+        ctx.drawImage(H.Sprites.sil(frame, '#7aa0ff'), x, y);
         ctx.globalAlpha = 1;
       }
       if (h.id === 'tom' && h.shieldFlash > 0 && !h.dead) {
