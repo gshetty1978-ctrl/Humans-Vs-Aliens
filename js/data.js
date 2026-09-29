@@ -9,7 +9,8 @@ window.HVA.asset = p => (window.HVA_ASSETS && window.HVA_ASSETS[p]) || p;
     { id: 'sam', name: 'SNIPER SAM', icon: '🎯', role: 'Long-range Damage', cost: 175, hp: 90, dmg: 100, cd: 3.0, range: 12, rangeLabel: 'Very Long', ability: '25% chance of a double-damage critical.', desc: 'One shot. One alien less.', price: 500, proj: 'sniper', scale: 2 },
     { id: 'eli', name: 'ENGINEER ELI', icon: '🤖', role: 'Engineer / Support', cost: 200, hp: 150, dmg: 15, cd: 1.5, range: 4, rangeLabel: 'Medium', ability: 'Builds a drone (75 HP, 10 dmg, fast fire) every 12s.', desc: 'If it can be built, Eli can weaponize it.', price: 650, proj: 'blue', scale: 2 },
     { id: 'priya', name: 'PLASMA PRIYA', icon: '🟣', role: 'Area Damage', cost: 250, hp: 130, dmg: 60, cd: 2.0, range: 7, rangeLabel: 'Long', ability: 'Plasma orbs explode, hitting nearby aliens.', desc: 'Why shoot one alien when you can hit five?', price: 800, proj: 'plasma', scale: 2 },
-    { id: 'max', name: 'COMMANDER MAX', icon: '👑', role: 'Ultimate Defender', cost: 400, hp: 500, dmg: 120, cd: 2.0, range: 9, rangeLabel: 'Long', ability: 'Ultimate missile hits every alien in the lane (20s cooldown).', desc: 'The last line of defense.', price: 1200, proj: 'missile', scale: 2 }
+    { id: 'max', name: 'COMMANDER MAX', icon: '👑', role: 'Ultimate Defender', cost: 400, hp: 500, dmg: 120, cd: 2.0, range: 9, rangeLabel: 'Long', ability: 'Ultimate missile hits every alien in the lane (20s cooldown).', desc: 'The last line of defense.', price: 1200, proj: 'missile', scale: 2 },
+    { id: 'chronos', name: 'CHRONOS', icon: '🔰', role: 'Heavy-Armored Support', cost: 300, hp: 450, dmg: 25, cd: 2.2, range: 1.3, rangeLabel: 'Short', ability: 'Periodically shields itself and nearby humans, reducing damage taken.', desc: 'A wall of purple steel and borrowed time.', price: 1500, proj: 'melee', scale: 1.7 }
   ];
 
   H.REACTOR = { id: 'reactor', price: 0, name: 'NUCLEAR REACTOR', icon: '☢️', role: 'Energy Generator', cost: 75, hp: 120, dmg: 0, cd: 1, range: 0, rangeLabel: 'None', ability: 'Drops a 25 ⚡ energy cell every 9s.', desc: 'Definitely safe. Probably.' };
@@ -169,6 +170,7 @@ window.HVA.asset = p => (window.HVA_ASSETS && window.HVA_ASSETS[p]) || p;
     sam: 'SPECIAL: +5% critical chance per level',
     eli: 'SPECIAL: stronger, tougher drones',
     priya: 'SPECIAL: bigger plasma blast radius',
-    max: 'SPECIAL: ultimate recharges 2s faster per level'
+    max: 'SPECIAL: ultimate recharges 2s faster per level',
+    chronos: 'SPECIAL: shield reduces more damage, recharges faster per level'
   };
 })(window.HVA);

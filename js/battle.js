@@ -3,7 +3,7 @@
   const FIELD_R = G.GX + G.COLS * G.CW;
   const AL_SCALE = 1.5;
   const AP = { sniper: 0.6, gold: 0.3, plasma: 0.3, laser: 0.15, ult: 1 };
-  const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, reactor: 7.5, firewall: 20, dynamite: 30 };
+  const RECHARGE = { ryan: 5, lucy: 7.5, tom: 10, maya: 8, sam: 12, eli: 12, priya: 14, max: 20, chronos: 16, reactor: 7.5, firewall: 20, dynamite: 30 };
   H.RECHARGE = RECHARGE;
   const BOSS_MULT = { commander: 2, shield: 4, prime: 1.5, frosttitan: 3, magmawyrm: 3, kraken: 3, voidtitan: 4, swamphydra: 4, stormcolossus: 4, pharaoh: 4, omegaprime: 5 };
   const BURST = {
@@ -134,7 +134,8 @@
       const h = {
         id: d.id, def: d, up, row, col, x: cellCX(col), hp, maxhp: hp, cdT: 0.5, animT: Math.random() * 6, atk: 0, hit: 0, dead: false,
         deathT: 0, disabled: 0, pend: [], healT: 3, buildT: d.id === 'eli' ? 3.5 : 0, building: 0, drone: null, ultT: d.id === 'max' ? 6 : 0,
-        ultReady: false, aim: 0, spawnT: 0.35, zapFx: 0, shieldFlash: 0, ultAnim: 0, prodT: 5, fuseT: d.id === 'dynamite' ? 1.5 : 0
+        ultReady: false, aim: 0, spawnT: 0.35, zapFx: 0, shieldFlash: 0, ultAnim: 0, prodT: 5, fuseT: d.id === 'dynamite' ? 1.5 : 0,
+        shieldT: d.id === 'chronos' ? 4 : 0, shieldFx: 0, dmgReduceT: 0, dmgReducePct: 0
       };
       this.humans.push(h); this.cells[row][col] = h;
       this.stats.placed++;
@@ -147,6 +148,7 @@
     hurtHuman(h, dmg) {
       if (h.dead) return;
       if (h.id === 'tom') { dmg *= 1 - 0.08 * (h.up.spc || 0); h.shieldFlash = 0.25; }
+      if (h.dmgReduceT > 0) dmg *= (1 - h.dmgReducePct);
       dmg = Math.max(1, Math.round(dmg));
       h.hp -= dmg; h.hit = 0.18;
       this.floatText(h.x + rand(-8, 8), footY(h.row) - (h.isDrone ? 60 : 70), '-' + dmg, '#ff6b6b', 10);
@@ -482,6 +484,18 @@
         case 'eli': this.proj(h, 'blue', dmg, 360); H.Sound.pistol(); break;
         case 'priya': this.proj(h, 'plasma', dmg, 270, { aoe: G.CW * 1.15 * (1 + 0.15 * spc) }); H.Sound.plasma(); break;
         case 'max': this.proj(h, 'gold', dmg, 460); H.Sound.plasma(); this.addShake(2); break;
+        case 'chronos':
+          h.atk = 0.3;
+          h.pend.push({ t: 0.25, fn: () => {
+            const t = this.findTarget(h, H.stat(d, up, 'range') * G.CW);
+            H.Sound.hit(); this.addShake(2);
+            if (t) {
+              const tx = t === this.ms ? t.x - 180 : t.x;
+              this.burst(tx, footY(h.row) - 40, 10, ['#a06bff', '#ffffff', '#d0b0ff'], 90, 0, 0.4, 3);
+              if (t === this.ms) this.hurtMs(dmg); else this.hurtAlien(t, dmg, false, 0.2);
+            }
+          } });
+          break;
       }
       h.atkMax = h.atk;
     }
@@ -491,7 +505,7 @@
       h.animT += dt;
       h.spawnT = Math.max(0, h.spawnT - dt);
       h.atk = Math.max(0, h.atk - dt); h.hit = Math.max(0, h.hit - dt); h.shieldFlash = Math.max(0, h.shieldFlash - dt);
-      h.ultAnim = Math.max(0, h.ultAnim - dt); h.zapFx = Math.max(0, h.zapFx - dt);
+      h.ultAnim = Math.max(0, h.ultAnim - dt); h.zapFx = Math.max(0, h.zapFx - dt); h.dmgReduceT = Math.max(0, (h.dmgReduceT || 0) - dt);
       for (const p of h.pend) p.t -= dt;
       const ready = h.pend.filter(p => p.t <= 0); h.pend = h.pend.filter(p => p.t > 0);
       ready.forEach(p => p.fn());
@@ -536,6 +550,19 @@
           if (any) { H.Sound.heal(); h.healFx = 0.7; }
         }
         h.healFx = Math.max(0, (h.healFx || 0) - dt);
+      }
+      if (h.id === 'chronos') {
+        h.shieldT -= dt;
+        if (h.shieldT <= 0) {
+          h.shieldT = Math.max(5, 10 - (up.spc || 0));
+          let any = false;
+          for (const o of this.humans) {
+            if (o.dead || o.isDrone || Math.abs(o.col - h.col) > 1 || Math.abs(o.row - h.row) > 1) continue;
+            o.dmgReduceT = 4; o.dmgReducePct = 0.3 + 0.05 * (up.spc || 0); any = true;
+          }
+          if (any) { H.Sound.heal(); h.shieldFx = 0.7; this.burst(h.x, footY(h.row) - 50, 14, ['#a06bff', '#d0b0ff', '#ffffff'], 70, -20, 0.6, 3); this.floatText(h.x, footY(h.row) - 100, 'SHIELD UP!', '#a06bff', 9); }
+        }
+        h.shieldFx = Math.max(0, (h.shieldFx || 0) - dt);
       }
       if (h.id === 'eli') {
         if (h.building > 0) {
@@ -1057,6 +1084,11 @@
         ctx.globalAlpha = 0.35 + 0.25 * Math.sin(this.time * 20);
         ctx.drawImage(H.Sprites.sil(frame, '#7ffcff'), x, y);
         if (h.disabled > 0) { ctx.globalAlpha = 1; this.drawText(ctx, 'ZZT', h.x, y + padY - 4, '#7ffcff', 8); }
+      }
+      if (h.dmgReduceT > 0 && !h.dead) {
+        ctx.globalAlpha = 0.3 + 0.15 * Math.sin(this.time * 8);
+        ctx.drawImage(H.Sprites.sil(frame, '#a06bff'), x, y);
+        ctx.globalAlpha = 1;
       }
       if (h.id === 'tom' && h.shieldFlash > 0 && !h.dead) {
         ctx.globalAlpha = 0.8; ctx.fillStyle = '#7ffcff';
