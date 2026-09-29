@@ -217,20 +217,35 @@
     for (let y = 36; y < 174; y += 3) px(186, y, 238, 1, 'rgba(0,0,0,0.25)');
     if (pulse > 0.4) txt('⚠ ALERT', 196, 56, 10, '#ff5a5a', 'left', '#000');
     px(200, 178, 210, 8, '#3a4a80'); px(210, 186, 190, 14, '#232c50');
-    human('max', 130, 300, { t: lt, sc: 0.8, fps: 2 });
-    const grab = lt > 1.5;
-    [['ryan', 470], ['tom', 512], ['sam', 554]].forEach(([id, x], i) => human(id, x, 300, { t: lt * 1.3 + i, sc: 0.72, anim: grab ? 'special' : 'idle', fps: 3 }));
-    const on = lt > 2.6;
+    const SUIT = [[0, 130, 'max'], [1, 400, 'titan'], [2, 470, 'ryan'], [3, 512, 'tom'], [4, 554, 'sam']];
+    const suited = lt > 1.3;
+    if (!suited) {
+      const walkK = ease(clamp(lt / 1.0, 0, 1));
+      SUIT.forEach(([civId, x, id], i) => {
+        const fromLeft = civId % 2 === 0, startX = fromLeft ? x - 150 : x + 150;
+        const cx0 = lerp(startX, x, walkK);
+        civ(civId, cx0, 300, { t: lt * 3 + i, walk: true, flip: !fromLeft });
+      });
+      if (lt > 0.95 && lt < 1.2) { const fk = 1 - Math.abs((lt - 1.075) / 0.125); g.globalAlpha = 0.7 * fk; SUIT.forEach(([, x]) => ell(x, 280, 30 + 40 * fk, 60 + 50 * fk, '#ffffff')); g.globalAlpha = 1; }
+    } else {
+      const grab = lt > 1.9;
+      SUIT.forEach(([, x, id], i) => human(id, x, 300, { t: (id === 'max' ? lt : lt * 1.3) + i, sc: id === 'max' ? 0.8 : 0.72, anim: grab ? 'special' : 'idle', fps: id === 'max' ? 2 : 3 }));
+    }
+    if (lt > 0.95 && lt < 1.1) flash = 0.4;
+    const on = lt > 2.9;
     const m = H.Sprites.reactor && H.Sprites.reactor[Math.floor(lt * 4) % 2];
     if (m) { const mw = m.width * 3, mh = m.height * 3; g.drawImage(m, Math.round(600 - mw / 2), Math.round(300 - mh), mw, mh); if (on) { g.globalAlpha = 0.25 + 0.15 * pulse; ell(600, 300 - mh / 2, 44, 60, '#8dff7a'); g.globalAlpha = 1; } }
     human('eli', 566, 316, { t: lt, sc: 0.6, anim: on ? 'special' : 'idle', fps: 4, flip: false });
     human('maya', 636, 316, { t: lt + 1, sc: 0.6, anim: on ? 'special' : 'idle', fps: 4, flip: true });
     if (on) { for (let i = 0; i < 4; i++) { g.strokeStyle = '#eaffd0'; g.lineWidth = 2; g.beginPath(); let x = 600, y = 250; g.moveTo(x, y); for (let k = 0; k < 5; k++) { x += (Math.random() - 0.5) * 30; y -= 12 + Math.random() * 6; g.lineTo(x, y); } g.stroke(); } }
-    if (lt > 3.6) { const full = "Then we'll defend it.", n = Math.min(full.length, Math.floor((lt - 3.6) * 14)); px(30, HH - 76, 580, 54, '#0a0a1a'); px(30, HH - 76, 580, 3, '#54c7ff'); px(30, HH - 25, 580, 3, '#54c7ff'); txt('COMMANDER MAX', 44, HH - 56, 8, '#7ffcff'); txt(full.slice(0, n), 44, HH - 36, 12, '#ffffff'); }
-    if (lt > 3.2 && lt < 3.35) flash = 0.5;
+    if (lt > 3.9) { const full = "Then we'll save it.", n = Math.min(full.length, Math.floor((lt - 3.9) * 14)); px(30, HH - 76, 580, 54, '#0a0a1a'); px(30, HH - 76, 580, 3, '#54c7ff'); px(30, HH - 25, 580, 3, '#54c7ff'); txt('COMMANDER MAX', 44, HH - 56, 8, '#7ffcff'); txt(full.slice(0, n), 44, HH - 36, 12, '#ffffff'); }
+    if (lt > 2.9 && lt < 3.05) flash = 0.5;
   }
 
-  const HUM = [['max', 0, 0], ['lucy', 0, 2], ['maya', 1, 0], ['eli', 1, 2], ['ryan', 2, 1], ['tom', 3, 3], ['priya', 3, 1], ['sam', 4, 2]];
+  const HUM = [
+    ['max', 0, 0], ['lucy', 0, 2], ['maya', 1, 0], ['eli', 1, 2], ['ryan', 2, 1], ['tom', 3, 3], ['priya', 3, 1], ['sam', 4, 2],
+    ['chronos', 0, 5], ['neon', 0, 7], ['goliath', 1, 6], ['phoenix', 2, 5], ['maven', 2, 8], ['valkyrie', 3, 6], ['titan', 4, 5], ['cobalt', 4, 8]
+  ];
   const ALN = [['slime', 0, 7], ['grunt', 1, 8], ['brute', 2, 7], ['scorpion', 3, 8], ['shield', 4, 7], ['trooper', 2, 8], ['cactus', 4, 8], ['jet', 0, 8]];
   const G = H.G, cellCX = c => G.GX + c * G.CW + G.CW / 2, footY = r => G.GY + r * G.RH + G.RH - 8;
 
@@ -245,7 +260,7 @@
     g.drawImage(layers.bg, 0, 0);
     g.fillStyle = 'rgba(20,10,40,0.18)'; g.fillRect(0, 0, 964, 584);
     const items = [];
-    HUM.forEach(([id, r, c], i) => { const at = 1 + i * 0.5; if (lt5 >= at || t >= T.s6) items.push({ y: footY(r), draw: () => { const pop = t < T.s6 ? clamp(1 - (lt5 - at) * 3, 0, 1) : 0; if (pop > 0) { g.globalAlpha = 0.6 * pop; ell(cellCX(c), footY(r) - 40, 34 * pop + 10, 50, '#7ffcff'); g.globalAlpha = 1; } human(id, cellCX(c), footY(r) + 4, { t: t + i, sc: 0.9, fps: 4 }); } }); });
+    HUM.forEach(([id, r, c], i) => { const at = 0.4 + i * 0.4; if (lt5 >= at || t >= T.s6) items.push({ y: footY(r), draw: () => { const pop = t < T.s6 ? clamp(1 - (lt5 - at) * 3, 0, 1) : 0; if (pop > 0) { g.globalAlpha = 0.6 * pop; ell(cellCX(c), footY(r) - 40, 34 * pop + 10, 50, '#7ffcff'); g.globalAlpha = 1; } human(id, cellCX(c), footY(r) + 4, { t: t + i, sc: 0.9, fps: 4 }); } }); });
     ALN.forEach(([type, r, c], i) => { const at = 2.4 + i * 0.5; if (lt5 >= at || t >= T.s6) items.push({ y: footY(r), draw: () => { const a = t < T.s6 ? clamp((lt5 - at) / 0.6, 0, 1) : 1; alien(type, cellCX(c), footY(r) + 4, 1.5, Math.floor(t * 4 + i) % 2, { grow: 0.4 + 0.6 * a, alpha: 0.3 + 0.7 * a }); if (a < 1) { g.globalAlpha = 1 - a; alien(type, cellCX(c), footY(r) + 4, 1.5, 0, { sil: '#ff3b6b', grow: 0.4 + 0.6 * a }); g.globalAlpha = 1; } } }); });
     items.sort((a, b) => a.y - b.y).forEach(it => it.draw());
     if (t >= T.s5 + boom - 1 && t < T.s5 + boom + 0.05) {
