@@ -58,6 +58,9 @@
     $('waveTotal').textContent = level.waves;
     $('btnSpeed').textContent = '1x';
     $('bossBar').hidden = true;
+    Hud.trayOpen = true;
+    $('bank').classList.remove('tray-closed');
+    $('btnTray').textContent = '◀';
     Hud.fit();
     Hud.update(true);
     requestAnimationFrame(Hud.fit);
@@ -202,6 +205,13 @@
       H.Sound.click();
       b.speed = b.speed === 1 ? 2 : b.speed === 2 ? 3 : 1;
       $('btnSpeed').textContent = b.speed + 'x';
+      return true;
+    }
+    if (act === 'toggleTray') {
+      H.Sound.click();
+      Hud.trayOpen = !Hud.trayOpen;
+      $('bank').classList.toggle('tray-closed', !Hud.trayOpen);
+      $('btnTray').textContent = Hud.trayOpen ? '◀' : '▶';
       return true;
     }
     return false;

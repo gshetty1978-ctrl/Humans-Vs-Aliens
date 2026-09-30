@@ -192,7 +192,9 @@ input[type=range] { width: 160px; accent-color: var(--yel); height: 30px; }
 #bank { flex: none; display: flex; align-items: stretch; gap: 8px; padding: 8px 10px; background: linear-gradient(180deg, #1a1a55, #0d0d33); box-shadow: 0 4px 0 var(--edge); overflow-x: auto; overflow-y: hidden; touch-action: pan-x; z-index: 3; -webkit-overflow-scrolling: touch; }
 #bank .hstat.energy { flex: none; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-width: 84px; padding: 6px 10px; }
 #bank .hstat.energy b { font-size: 20px; min-width: 0; text-align: center; }
-#tray { display: flex; gap: 6px; flex: none; }
+#tray { display: flex; gap: 6px; flex: none; overflow: hidden; transition: max-width .2s ease, opacity .2s ease; max-width: 2000px; opacity: 1; }
+#bank.tray-closed #tray { max-width: 0; opacity: 0; margin: 0; pointer-events: none; }
+#btnTray { flex: none; }
 .tcard { flex: 0 0 64px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; background: linear-gradient(180deg, #2a2a8a, #14143f); box-shadow: inset 0 0 0 3px #4a4ad0, 0 0 0 3px var(--edge); padding: 4px 2px 4px; min-height: 92px; cursor: pointer; user-select: none; }
 .tcard .k { position: absolute; top: 3px; left: 4px; font-size: 7px; color: var(--dim); }
 .tcard .pt { height: 56px; width: 100%; display: flex; align-items: flex-end; justify-content: center; }

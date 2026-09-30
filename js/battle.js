@@ -62,7 +62,7 @@
       this.hooks.banner && this.hooks.banner(this.sandbox ? 'SANDBOX — NOTHING IS SAVED' : 'WAVE 1 IN ' + Math.round(this.nextWaveAt) + 's — COLLECT ⚡', 'info');
     }
 
-    up(id) { return this.sandbox && this.maxUp ? { dmg: 5, hp: 5, spd: 5, rng: 5, spc: 5 } : H.Save.upgrades(id); }
+    up(id) { return this.sandbox && this.maxUp ? { dmg: 4, hp: 4, spd: 4, rng: 4, spc: 4 } : H.Save.upgrades(id); }
     hdef(id) { return H.defOf(id); }
 
     select(id) {
