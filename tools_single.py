@@ -23,6 +23,8 @@ assets = {}
 for f in sorted(os.listdir('assets')):
     if f.endswith('.png') and not f.startswith('sheet_source'):
         assets['assets/' + f] = datauri('assets/' + f, 'image/png')
+    elif f.endswith('.mp3'):
+        assets['assets/' + f] = datauri('assets/' + f, 'audio/mpeg')
     elif f.endswith('.ico'):
         assets['assets/' + f] = datauri('assets/' + f, 'image/x-icon')
 

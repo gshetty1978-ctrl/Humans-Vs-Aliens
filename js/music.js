@@ -1,6 +1,57 @@
 (function (H) {
-  const M = { ctx: null, sess: null, name: null, intensity: 0.6, duck: 1, timer: null, ready: false };
+  const M = { ctx: null, sess: null, name: null, intensity: 0.6, duck: 1, timer: null, ready: false, fileAudio: null, filePath: null };
   H.Music = M;
+
+  const LEVEL_FILE = 'assets/music_level.mp3';
+  const BOSS_FILE = 'assets/music_boss.mp3';
+  const fileEls = {};
+
+  function fileFor(name) {
+    if (/^w\d+$/.test(name)) return LEVEL_FILE;
+    if (['boss', 'boss2', 'boss3', 'mothership'].includes(name)) return BOSS_FILE;
+    return null;
+  }
+
+  function getFileAudio(path) {
+    if (!fileEls[path]) {
+      const a = new Audio(H.asset(path));
+      a.loop = true; a.preload = 'auto'; a.volume = 0;
+      fileEls[path] = a;
+    }
+    return fileEls[path];
+  }
+
+  function fileVol() {
+    const s = H.Save.data.settings;
+    return (s.music === false ? 0 : (s.musicVol == null ? 0.6 : s.musicVol)) * M.duck;
+  }
+
+  function fadeFileTo(a, target, dur) {
+    if (a._fadeT) clearInterval(a._fadeT);
+    const start = a.volume, t0 = performance.now();
+    a._fadeT = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / (dur * 1000));
+      a.volume = start + (target - start) * k;
+      if (k >= 1) { clearInterval(a._fadeT); a._fadeT = null; if (target === 0) a.pause(); }
+    }, 40);
+  }
+
+  function stopFileAudio() {
+    if (!M.fileAudio) return;
+    const a = M.fileAudio;
+    fadeFileTo(a, 0, 0.6);
+    M.fileAudio = null; M.filePath = null;
+  }
+
+  function playFile(path) {
+    if (M.filePath === path && M.fileAudio && !M.fileAudio.paused) return;
+    const prev = M.fileAudio;
+    if (prev && prev !== fileEls[path]) fadeFileTo(prev, 0, 0.6);
+    const a = getFileAudio(path);
+    if (a.paused) { a.currentTime = a.currentTime || 0; a.play().catch(() => { M.pending = M.name; }); }
+    fadeFileTo(a, fileVol(), 0.8);
+    M.fileAudio = a; M.filePath = path;
+  }
 
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -119,10 +170,11 @@
 
   const TRACKS = {
     menu: {
-      bpm: 96, root: 45, scale: 'minor', fixed: 0.9, swing: 0.04, padI: 'warm', leadI: 'super', arpI: 'bell', bassI: 'round',
+      bpm: 96, root: 45, scale: 'minor', fixed: 0.9, swing: 0.05, padI: 'choir', leadI: 'super', arpI: 'bell', bassI: 'round',
       sections: [
-        { prog: rep([P(0, 'min7'), P(5, 'maj7'), P(2, 'maj'), P(6, 'maj')], 2), drums: 'half', bass: 'half', arp: 'updown', seed: 11 },
+        { prog: rep([P(0, 'min7'), P(5, 'maj7'), P(2, 'maj'), P(6, 'maj')], 2), drums: 'half', bass: 'half', arp: 'pluck', seed: 11 },
         { prog: rep([P(3, 'min'), P(5, 'maj'), P(0, 'min'), P(4, 'dom7')], 2), drums: 'anthem', bass: 'drive', arp: 'skip', seed: 23, shift: 2 },
+        { prog: rep([P(0, 'min7'), P(3, 'maj7'), P(5, 'maj7'), P(6, 'maj')], 2), drums: 'anthem', bass: 'drive', arp: 'up16', seed: 41, shift: 4 },
         { prog: [P(0, 'min7'), P(5, 'maj7'), P(3, 'min7'), P(4, 'dom7')], bars: 4, drums: 'half', bass: 'half', arp: 'up16', seed: 31, breakdown: true }
       ]
     },
@@ -287,7 +339,7 @@
     for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
     noiseBuf = nb;
     const conv = c.createConvolver(); conv.buffer = makeIR(c, 2.6, 2.4);
-    revIn = c.createGain(); const revOut = c.createGain(); revOut.gain.value = 0.42;
+    revIn = c.createGain(); const revOut = c.createGain(); revOut.gain.value = 0.5;
     revIn.connect(conv); conv.connect(revOut); revOut.connect(master);
     M.ready = true;
     M.applySettings();
@@ -295,6 +347,7 @@
   }
 
   M.applySettings = function () {
+    if (M.fileAudio) fadeFileTo(M.fileAudio, fileVol(), 0.3);
     if (!M.ready) return;
     const s = H.Save.data.settings;
     const v = s.music === false ? 0 : (s.musicVol == null ? 0.6 : s.musicVol);
@@ -594,7 +647,15 @@
     if (!M.ensure()) { M.pending = name; return; }
     if (M.ctx.state === 'suspended' && navigator.userActivation && !navigator.userActivation.hasBeenActive) { M.pending = name; return; }
     M.pending = null;
-    if (M.name === name && M.sess && !M.sess.dead) return;
+    if (M.name === name && ((M.sess && !M.sess.dead) || M.fileAudio)) return;
+    const fp = fileFor(name);
+    if (fp) {
+      retire(M.sess); M.sess = null;
+      M.name = name;
+      playFile(fp);
+      return;
+    }
+    stopFileAudio();
     retire(M.sess);
     M.name = name;
     const s = makeSession(TRACKS[name]);
@@ -607,6 +668,7 @@
 
   M.stop = function () {
     if (M.sess) retire(M.sess);
+    stopFileAudio();
     M.sess = null; M.name = null; M.pending = null;
   };
 
@@ -656,6 +718,7 @@
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { if (M.pending) M.play(M.pending); }, true));
 
   document.addEventListener('visibilitychange', () => {
+    if (M.fileAudio) { if (document.hidden) M.fileAudio.pause(); else M.fileAudio.play().catch(() => {}); }
     if (!M.ready) return;
     if (document.hidden) M.ctx.suspend(); else M.ctx.resume();
   });
