@@ -7,6 +7,7 @@
   const stars = (n, max) => { let s = ''; for (let i = 0; i < (max || 3); i++) s += '<span class="' + (i < n ? 'star-on' : 'star-off') + '">★</span>'; return s; };
   const speedLabel = v => v >= 0.95 ? 'Very Fast' : v >= 0.7 ? 'Fast' : v >= 0.45 ? 'Normal' : 'Slow';
   const playerLevel = () => 1 + Math.floor(S().data.xp / 150);
+  const inIframe = () => { try { return window.self !== window.top; } catch (e) { return true; } };
   const totalStars = () => Object.values(S().data.stars).reduce((a, b) => a + b, 0);
 
   UI.toast = function (text, cls) {
@@ -60,7 +61,7 @@
     return '<div class="wrap"><h1 class="title">HUMANS<span class="vs">VS</span>ALIENS</h1><div class="subtitle">DEFEND EARTH. ONE LANE AT A TIME.</div>' +
       '<div class="menu"><button class="btn play" data-act="play">▶ PLAY</button><button class="btn" data-act="humans">🛒 SHOP</button><button class="btn" data-act="aliens">👽 ALIENS</button><button class="btn" data-act="sandbox">🧪 SANDBOX</button>' +
       '<button class="btn" data-act="upgrades">🔧 UPGRADES</button><button class="btn" data-act="achievements">🏆 ACHIEVEMENTS</button><button class="btn" data-act="settings">⚙ SETTINGS</button></div>' +
-      '<div class="itch-embed"><iframe src="https://itch.io/embed/5057446" width="552" height="167" frameborder="0"><a href="https://cricketlover.itch.io/humans-vs-aliens">Humans Vs Aliens 🛸 by cricketlover</a></iframe></div>' + ddLang(true) +
+      (inIframe() ? '' : '<div class="itch-embed"><iframe src="https://itch.io/embed/5057446" width="552" height="167" frameborder="0"><a href="https://cricketlover.itch.io/humans-vs-aliens">Humans Vs Aliens 🛸 by cricketlover</a></iframe></div>') + ddLang(true) +
       '<div class="menu-foot"><span class="pill">RANK LV ' + playerLevel() + '</span><span class="pill">★ ' + totalStars() + ' / ' + H.LEVELS.length * 3 + '</span><span class="pill">🔧 ' + d.tech + ' TECH</span><span class="pill">🪙 ' + d.coins + '</span></div>' +
       '<div class="credits">A <b>Kiaan Ganesh Shetty</b> Creation &middot; 2026 &middot; 1 Week In The Making</div></div>';
   };
