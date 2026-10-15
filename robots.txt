@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://humans-vs-aliens.onrender.com/sitemap.xml
